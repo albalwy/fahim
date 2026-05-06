@@ -7,133 +7,128 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
   <style>
-    /* ════════════════════════════════ متغيرات التصميم ════════════════════════════════ */
     :root {
-      --navy: #1A3152; --navy-dark: #0F1E33; --navy-mid: #234072;
-      --gold: #C9A84C; --gold-light: #E8C97A; --gold-dim: rgba(201,168,76,0.18);
-      --bg: #ECF0F6; --card-bg: #FFFFFF; --card-border: #D8E0EC;
-      --text-h: #111E30; --text-b: #4A6080; --text-light: #8099B8;
-      --inactive-op: 0.32; --radius: 14px; --radius-sm: 8px;
-      --transition: all 0.38s cubic-bezier(0.4,0,0.2,1);
-      --shadow-card: 0 2px 12px rgba(26,49,82,0.09);
-      --shadow-active: 0 6px 28px rgba(201,168,76,0.38), 0 0 0 2px var(--gold);
+      --navy:#1A3152; --navy-dark:#0F1E33; --navy-mid:#234072;
+      --gold:#C9A84C; --gold-light:#E8C97A; --gold-dim:rgba(201,168,76,0.18);
+      --bg:#ECF0F6; --card-bg:#FFFFFF; --card-border:#D8E0EC;
+      --text-h:#111E30; --text-b:#4A6080; --text-light:#8099B8;
+      --inactive-op:0.32; --radius:14px; --radius-sm:8px;
+      --transition:all 0.38s cubic-bezier(0.4,0,0.2,1);
+      --shadow-card:0 2px 12px rgba(26,49,82,0.09);
+      --shadow-active:0 6px 28px rgba(201,168,76,0.38), 0 0 0 2px var(--gold);
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100vh; overflow: hidden; font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--text-h); }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100vh;overflow:hidden;font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text-h);}
 
-    #startScreen { position: fixed; inset: 0; background: linear-gradient(160deg, var(--navy-dark) 0%, var(--navy) 60%, #1e4070 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; z-index: 200; transition: opacity 0.5s ease; }
-    #startScreen.fade-out { opacity: 0; pointer-events: none; }
-    #startScreen.hidden { display: none; }
-    .start-emblem { font-size: 3.6rem; line-height: 1; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4)); }
-    .start-title { color: #fff; font-size: 1.85rem; font-weight: 800; text-align: center; letter-spacing: -0.3px; }
-    .start-divider { width: 60px; height: 3px; background: var(--gold); border-radius: 2px; }
-    .start-subtitle { color: var(--gold-light); font-size: 0.95rem; text-align: center; line-height: 1.7; max-width: 380px; }
-    .start-btn { margin-top: 8px; padding: 15px 44px; background: var(--gold); color: #fff; font-family: 'Tajawal', sans-serif; font-size: 1.05rem; font-weight: 700; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 6px 30px rgba(201,168,76,0.55); transition: var(--transition); }
-    .start-btn:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 10px 36px rgba(201,168,76,0.65); }
-    .sim-toggle-wrap { margin-top: 4px; }
-    .sim-toggle-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.38); font-family: 'Tajawal', sans-serif; font-size: 0.78rem; text-decoration: underline; transition: color 0.2s; }
-    .sim-toggle-btn:hover { color: rgba(255,255,255,0.65); }
-    .sim-toggle-btn.on { color: #FF8C42; }
+    #startScreen{position:fixed;inset:0;background:linear-gradient(160deg,var(--navy-dark) 0%,var(--navy) 60%,#1e4070 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:200;transition:opacity 0.5s ease;}
+    #startScreen.fade-out{opacity:0;pointer-events:none;}
+    #startScreen.hidden{display:none;}
+    .start-emblem{font-size:3.6rem;line-height:1;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4));}
+    .start-title{color:#fff;font-size:1.85rem;font-weight:800;text-align:center;letter-spacing:-0.3px;}
+    .start-divider{width:60px;height:3px;background:var(--gold);border-radius:2px;}
+    .start-subtitle{color:var(--gold-light);font-size:0.95rem;text-align:center;line-height:1.7;max-width:380px;}
+    .start-btn{margin-top:8px;padding:15px 44px;background:var(--gold);color:#fff;font-family:'Tajawal',sans-serif;font-size:1.05rem;font-weight:700;border:none;border-radius:50px;cursor:pointer;box-shadow:0 6px 30px rgba(201,168,76,0.55);transition:var(--transition);}
+    .start-btn:hover{background:var(--gold-light);transform:translateY(-2px);box-shadow:0 10px 36px rgba(201,168,76,0.65);}
+    .sim-toggle-wrap{margin-top:4px;}
+    .sim-toggle-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.38);font-family:'Tajawal',sans-serif;font-size:0.78rem;text-decoration:underline;transition:color 0.2s;}
+    .sim-toggle-btn:hover{color:rgba(255,255,255,0.65);}
+    .sim-toggle-btn.on{color:#FF8C42;}
 
-    #appHeader { background: var(--navy); padding: 0 20px; height: 58px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 16px rgba(0,0,0,0.28); flex-shrink: 0; }
-    .brand { display: flex; align-items: center; gap: 11px; }
-    .brand-logo { width: 34px; height: 34px; border-radius: 8px; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: #fff; flex-shrink: 0; }
-    .brand-name { color: #fff; font-size: 1rem; font-weight: 700; line-height: 1.2; }
-    .brand-sub { color: var(--gold); font-size: 0.7rem; font-weight: 400; }
-    .status-capsule { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.12); border-radius: 50px; padding: 7px 16px; }
-    #activeAgentName { color: #fff; font-size: 0.88rem; font-weight: 600; min-width: 80px; text-align: center; }
-    .status-pill { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: rgba(255,255,255,0.7); }
-    .s-dot { width: 8px; height: 8px; border-radius: 50%; background: #555; transition: background 0.3s; }
-    .s-dot.idle { background: #556; }
-    .s-dot.listening { background: #4CAF50; animation: pulse-g 1.6s infinite; }
-    .s-dot.speaking { background: var(--gold); animation: pulse-d 1.4s infinite; }
-    .s-dot.transferring{ background: #42A5F5; animation: pulse-b 0.7s infinite; }
+    #appHeader{background:var(--navy);padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 16px rgba(0,0,0,0.28);flex-shrink:0;}
+    .brand{display:flex;align-items:center;gap:11px;}
+    .brand-logo{width:34px;height:34px;border-radius:8px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;flex-shrink:0;}
+    .brand-name{color:#fff;font-size:1rem;font-weight:700;line-height:1.2;}
+    .brand-sub{color:var(--gold);font-size:0.7rem;font-weight:400;}
+    .status-capsule{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.12);border-radius:50px;padding:7px 16px;}
+    #activeAgentName{color:#fff;font-size:0.88rem;font-weight:600;min-width:80px;text-align:center;}
+    .status-pill{display:flex;align-items:center;gap:6px;font-size:0.75rem;color:rgba(255,255,255,0.7);}
+    .s-dot{width:8px;height:8px;border-radius:50%;background:#555;transition:background 0.3s;}
+    .s-dot.idle{background:#556;}
+    .s-dot.listening{background:#4CAF50;animation:pulse-g 1.6s infinite;}
+    .s-dot.speaking{background:var(--gold);animation:pulse-d 1.4s infinite;}
+    .s-dot.transferring{background:#42A5F5;animation:pulse-b 0.7s infinite;}
 
-    #appMain { height: calc(100vh - 58px); display: flex; flex-direction: column; padding: 14px 18px 12px; gap: 12px; overflow: hidden; }
-    #agentsGrid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 11px; flex: 1; min-height: 0; }
-    .agent-card { background: var(--card-bg); border: 2px solid var(--card-border); border-radius: var(--radius); padding: 14px 10px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; position: relative; overflow: hidden; cursor: pointer; transition: var(--transition); opacity: var(--inactive-op); box-shadow: var(--shadow-card); user-select: none; }
-    .agent-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gold); transform: scaleX(0); transform-origin: right; transition: transform 0.38s ease; }
-    .agent-card.available { opacity: 0.58; }
-    .agent-card.available:hover { opacity: 0.82; border-color: var(--gold-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.2); }
-    .agent-card.active { opacity: 1; border-color: var(--gold); box-shadow: var(--shadow-active); transform: scale(1.025) translateY(-1px); }
-    .agent-card.active::before { transform: scaleX(1); }
-    .agent-card.leaving { animation: card-leave 0.42s forwards; }
-    .agent-card.entering { animation: card-enter 0.42s forwards; }
-    .card-badge { position: absolute; top: 8px; left: 8px; width: 9px; height: 9px; border-radius: 50%; transition: var(--transition); }
-    .agent-card.active .card-badge { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
-    .card-icon { font-size: 1.8rem; line-height: 1; }
-    .card-name { font-size: 0.88rem; font-weight: 700; color: var(--text-h); line-height: 1.2; }
-    .card-role { font-size: 0.68rem; color: var(--text-b); line-height: 1.3; }
-    .card-desc { font-size: 0.64rem; color: var(--text-light); line-height: 1.3; margin-top: 1px; }
+    #appMain{height:calc(100vh - 58px);display:flex;flex-direction:column;padding:14px 18px 12px;gap:12px;overflow:hidden;}
+    #agentsGrid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:11px;flex:1;min-height:0;}
+    .agent-card{background:var(--card-bg);border:2px solid var(--card-border);border-radius:var(--radius);padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:var(--transition);opacity:var(--inactive-op);box-shadow:var(--shadow-card);user-select:none;}
+    .agent-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform 0.38s ease;}
+    .agent-card.available{opacity:0.58;}
+    .agent-card.available:hover{opacity:0.82;border-color:var(--gold-light);transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,0.2);}
+    .agent-card.active{opacity:1;border-color:var(--gold);box-shadow:var(--shadow-active);transform:scale(1.025) translateY(-1px);}
+    .agent-card.active::before{transform:scaleX(1);}
+    .agent-card.leaving{animation:card-leave 0.42s forwards;}
+    .agent-card.entering{animation:card-enter 0.42s forwards;}
+    .card-badge{position:absolute;top:8px;left:8px;width:9px;height:9px;border-radius:50%;transition:var(--transition);}
+    .agent-card.active .card-badge{background:var(--gold);box-shadow:0 0 6px var(--gold);}
+    .card-icon{font-size:1.8rem;line-height:1;}
+    .card-name{font-size:0.88rem;font-weight:700;color:var(--text-h);line-height:1.2;}
+    .card-role{font-size:0.68rem;color:var(--text-b);line-height:1.3;}
+    .card-desc{font-size:0.64rem;color:var(--text-light);line-height:1.3;margin-top:1px;}
 
-    #controlsBar { display: flex; align-items: center; gap: 10px; background: var(--card-bg); border-radius: var(--radius); padding: 10px 14px; box-shadow: var(--shadow-card); flex-shrink: 0; }
-    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border: none; border-radius: 50px; font-family: 'Tajawal', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition); white-space: nowrap; }
-    .btn:disabled { opacity: 0.42; cursor: not-allowed; transform: none !important; }
-    .btn-navy { background: var(--navy); color: #fff; }
-    .btn-navy:not(:disabled):hover { background: var(--navy-mid); transform: translateY(-1px); }
-    .btn-danger { background: #DC3545; color: #fff; }
-    .btn-danger:not(:disabled):hover { background: #c82333; transform: translateY(-1px); }
-    .btn-mic { width: 42px; height: 42px; padding: 0; border-radius: 50%; font-size: 1.1rem; background: #F0F4FA; border: 2px solid var(--card-border); cursor: pointer; transition: var(--transition); margin-right: auto; display: flex; align-items: center; justify-content: center; }
-    .btn-mic:hover { border-color: var(--gold); }
-    .btn-mic.muted { background: #FFF0F0; border-color: #DC3545; }
-    .btn-mic.live { background: #F0FFF4; border-color: #4CAF50; }
+    #controlsBar{display:flex;align-items:center;gap:10px;background:var(--card-bg);border-radius:var(--radius);padding:10px 14px;box-shadow:var(--shadow-card);flex-shrink:0;}
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border:none;border-radius:50px;font-family:'Tajawal',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:var(--transition);white-space:nowrap;}
+    .btn:disabled{opacity:0.42;cursor:not-allowed;transform:none !important;}
+    .btn-navy{background:var(--navy);color:#fff;}
+    .btn-navy:not(:disabled):hover{background:var(--navy-mid);transform:translateY(-1px);}
+    .btn-danger{background:#DC3545;color:#fff;}
+    .btn-danger:not(:disabled):hover{background:#c82333;transform:translateY(-1px);}
+    .btn-mic{width:42px;height:42px;padding:0;border-radius:50%;font-size:1.1rem;background:#F0F4FA;border:2px solid var(--card-border);cursor:pointer;transition:var(--transition);margin-right:auto;display:flex;align-items:center;justify-content:center;}
+    .btn-mic:hover{border-color:var(--gold);}
+    .btn-mic.muted{background:#FFF0F0;border-color:#DC3545;}
+    .btn-mic.live{background:#F0FFF4;border-color:#4CAF50;}
 
-    #transcriptPanel { background: var(--card-bg); border-radius: var(--radius); padding: 10px 14px; max-height: 120px; min-height: 60px; overflow-y: auto; box-shadow: var(--shadow-card); flex-shrink: 0; display: flex; flex-direction: column; gap: 5px; scroll-behavior: smooth; }
-    #transcriptPanel:empty::before { content: 'سيظهر هنا نص الحوار حين يبدأ...'; color: var(--text-light); font-size: 0.8rem; }
-    .tr-row { display: flex; gap: 8px; font-size: 0.78rem; line-height: 1.45; animation: fadeup 0.25s ease; }
-    .tr-who { font-weight: 700; flex-shrink: 0; min-width: 70px; }
-    .tr-who.user { color: var(--navy); }
-    .tr-who.agent { color: var(--gold); }
-    .tr-who.system { color: var(--text-light); font-style: italic; }
-    .tr-text { color: var(--text-h); }
-    .tr-text.system { color: var(--text-light); font-style: italic; }
+    #transcriptPanel{background:var(--card-bg);border-radius:var(--radius);padding:10px 14px;max-height:120px;min-height:60px;overflow-y:auto;box-shadow:var(--shadow-card);flex-shrink:0;display:flex;flex-direction:column;gap:5px;scroll-behavior:smooth;}
+    #transcriptPanel:empty::before{content:'سيظهر هنا نص الحوار حين يبدأ...';color:var(--text-light);font-size:0.8rem;}
+    .tr-row{display:flex;gap:8px;font-size:0.78rem;line-height:1.45;animation:fadeup 0.25s ease;}
+    .tr-who{font-weight:700;flex-shrink:0;min-width:70px;}
+    .tr-who.user{color:var(--navy);}
+    .tr-who.agent{color:var(--gold);}
+    .tr-who.system{color:var(--text-light);font-style:italic;}
+    .tr-text{color:var(--text-h);}
+    .tr-text.system{color:var(--text-light);font-style:italic;}
 
-    #transferOverlay { position: fixed; inset: 0; background: rgba(15, 30, 51, 0.82); backdrop-filter: blur(6px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-    #transferOverlay.show { opacity: 1; pointer-events: all; }
-    .transfer-box { text-align: center; animation: float 2s ease-in-out infinite; }
-    .transfer-icon-wrap { font-size: 3.2rem; margin-bottom: 18px; display: inline-block; animation: spin-slow 2.5s linear infinite; }
-    .transfer-title { color: #fff; font-size: 1.25rem; font-weight: 700; margin-bottom: 8px; }
-    .transfer-sub { color: var(--gold-light); font-size: 0.92rem; }
+    #transferOverlay{position:fixed;inset:0;background:rgba(15,30,51,0.82);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:150;opacity:0;pointer-events:none;transition:opacity 0.3s ease;}
+    #transferOverlay.show{opacity:1;pointer-events:all;}
+    .transfer-box{text-align:center;animation:float 2s ease-in-out infinite;}
+    .transfer-icon-wrap{font-size:3.2rem;margin-bottom:18px;display:inline-block;animation:spin-slow 2.5s linear infinite;}
+    .transfer-title{color:#fff;font-size:1.25rem;font-weight:700;margin-bottom:8px;}
+    .transfer-sub{color:var(--gold-light);font-size:0.92rem;}
 
-    #errorBanner { position: fixed; top: 58px; left: 0; right: 0; background: #DC3545; color: #fff; text-align: center; padding: 9px 16px; font-size: 0.85rem; font-weight: 600; z-index: 130; display: none; }
-    #errorBanner.show { display: flex; align-items: center; justify-content: center; gap: 12px; }
-    #errorBanner button { background: #fff; color: #DC3545; border: none; border-radius: 20px; padding: 4px 14px; font-family: 'Tajawal', sans-serif; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
+    #errorBanner{position:fixed;top:58px;left:0;right:0;background:#DC3545;color:#fff;text-align:center;padding:9px 16px;font-size:0.85rem;font-weight:600;z-index:130;display:none;}
+    #errorBanner.show{display:flex;align-items:center;justify-content:center;gap:12px;}
+    #errorBanner button{background:#fff;color:#DC3545;border:none;border-radius:20px;padding:4px 14px;font-family:'Tajawal',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;}
 
-    #simBadge { position: fixed; bottom: 14px; left: 16px; background: #FF6B35; color: #fff; padding: 5px 13px; border-radius: 50px; font-size: 0.73rem; font-weight: 700; z-index: 100; display: none; }
-    #simBadge.show { display: block; }
-    #simInputBar { position: fixed; bottom: 12px; left: 50%; transform: translateX(50%); background: var(--navy); border-radius: 50px; padding: 6px 8px 6px 14px; display: none; align-items: center; gap: 8px; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.4); min-width: 340px; }
-    #simInputBar.show { display: flex; }
-    #simInputBar input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-family: 'Tajawal', sans-serif; font-size: 0.85rem; direction: rtl; }
-    #simInputBar input::placeholder { color: rgba(255,255,255,0.45); }
-    #simInputBar button { background: var(--gold); border: none; border-radius: 50px; color: #fff; padding: 6px 14px; font-family: 'Tajawal', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+    #simBadge{position:fixed;bottom:14px;left:16px;background:#FF6B35;color:#fff;padding:5px 13px;border-radius:50px;font-size:0.73rem;font-weight:700;z-index:100;display:none;}
+    #simBadge.show{display:block;}
+    #simInputBar{position:fixed;bottom:12px;left:50%;transform:translateX(50%);background:var(--navy);border-radius:50px;padding:6px 8px 6px 14px;display:none;align-items:center;gap:8px;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.4);min-width:340px;}
+    #simInputBar.show{display:flex;}
+    #simInputBar input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:0.85rem;direction:rtl;}
+    #simInputBar input::placeholder{color:rgba(255,255,255,0.45);}
+    #simInputBar button{background:var(--gold);border:none;border-radius:50px;color:#fff;padding:6px 14px;font-family:'Tajawal',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;}
 
-    #toast { position: fixed; top: 72px; left: 50%; transform: translateX(-50%) translateY(-10px); background: var(--navy); color: #fff; padding: 8px 20px; border-radius: 50px; font-size: 0.82rem; font-weight: 500; z-index: 180; opacity: 0; transition: opacity 0.25s, transform 0.25s; white-space: nowrap; pointer-events: none; }
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast{position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--navy);color:#fff;padding:8px 20px;border-radius:50px;font-size:0.82rem;font-weight:500;z-index:180;opacity:0;transition:opacity 0.25s,transform 0.25s;white-space:nowrap;pointer-events:none;}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-    @keyframes pulse-g { 0%,100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.5); } 50% { box-shadow: 0 0 0 5px rgba(76,175,80,0); } }
-    @keyframes pulse-d { 0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.5); } 50% { box-shadow: 0 0 0 5px rgba(201,168,76,0); } }
-    @keyframes pulse-b { 0%,100% { box-shadow: 0 0 0 0 rgba(66,165,245,0.6); } 50% { box-shadow: 0 0 0 5px rgba(66,165,245,0); } }
-    @keyframes card-leave { 0% { transform: scale(1.025); opacity: 1; } 100% { transform: scale(0.96); opacity: 0.3; } }
-    @keyframes card-enter { 0% { transform: scale(0.9); opacity: 0.3; } 100% { transform: scale(1.025); opacity: 1; } }
-    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    @keyframes fadeup { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 2px; }
+    @keyframes pulse-g{0%,100%{box-shadow:0 0 0 0 rgba(76,175,80,0.5);}50%{box-shadow:0 0 0 5px rgba(76,175,80,0);}}
+    @keyframes pulse-d{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.5);}50%{box-shadow:0 0 0 5px rgba(201,168,76,0);}}
+    @keyframes pulse-b{0%,100%{box-shadow:0 0 0 0 rgba(66,165,245,0.6);}50%{box-shadow:0 0 0 5px rgba(66,165,245,0);}}
+    @keyframes card-leave{0%{transform:scale(1.025);opacity:1;}100%{transform:scale(0.96);opacity:0.3;}}
+    @keyframes card-enter{0%{transform:scale(0.9);opacity:0.3;}100%{transform:scale(1.025);opacity:1;}}
+    @keyframes spin-slow{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+    @keyframes fadeup{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+    ::-webkit-scrollbar{width:4px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:2px;}
   </style>
 </head>
 <body>
 
-  <!-- شاشة البداية -->
   <div id="startScreen">
     <div class="start-emblem">🏢</div>
     <div class="start-title">منظومة الوكلاء الذكية</div>
     <div class="start-divider"></div>
-    <div class="start-subtitle">
-      القصواء للتطوير العقاري<br>
-      تسعة وكلاء متخصصون، خبرة واحدة متكاملة
-    </div>
+    <div class="start-subtitle">القصواء للتطوير العقاري<br>تسعة وكلاء متخصصون، خبرة واحدة متكاملة</div>
     <button class="start-btn" onclick="startPresentation()">ابدأ التعريف</button>
     <div class="sim-toggle-wrap">
       <button class="sim-toggle-btn" id="simToggleBtn" onclick="toggleSimMode()">
@@ -142,7 +137,6 @@
     </div>
   </div>
 
-  <!-- لافتة الخطأ -->
   <div id="errorBanner">
     <span>⚠️ انقطع الاتصال بالخادم</span>
     <button onclick="retryConnection()">إعادة المحاولة</button>
@@ -192,10 +186,7 @@
 
   <div id="toast"></div>
 
-  <!-- ════════════════════════════════════════════════════════════════════════
-       🛡️ FIX C3: تعريف معالجات SDK في النطاق العام مسبقاً
-       حتى لا يحدث ReferenceError إذا فشل CDN قبل تحميل بقية الكود
-       ════════════════════════════════════════════════════════════════════════ -->
+  <!-- FIX C3: تعريف معالجات SDK في النطاق العام مسبقاً -->
   <script>
     window.onSDKLoad = function () {
       if (window.ElevenLabs?.Conversation) {
@@ -215,7 +206,6 @@
           console.warn('[SDK] ⚠️ لم يُعثر على Conversation API.');
         }
       }
-      // مزامنة المتغير الداخلي إن كان قد عُرّف
       if (typeof window.__syncConvAPI === 'function') window.__syncConvAPI();
     };
     window.onSDKError = function () {
@@ -226,59 +216,431 @@
   <script src="https://unpkg.com/@11labs/client@latest/dist/index.umd.js"
           onload="onSDKLoad()" onerror="onSDKError()"></script>
 
+<!-- ═══════════════════ نهاية الجزء 1 — اطلب الجزء 2 لإكمال الـ <script> الرئيسي و</body></html> ═══════════════════ -->
   <script>
-    'use strict';
+'use strict';
 
-    /* ⚙️ Agent IDs */
-    const AGENT_IDS = {
-      fahim: 'AGENT_ID_FAHIM', network: 'AGENT_ID_NETWORK', systems: 'AGENT_ID_SYSTEMS',
-      apps: 'AGENT_ID_APPS', bim: 'AGENT_ID_BIM', trainer: 'AGENT_ID_TRAINER',
-      robotics: 'AGENT_ID_ROBOTICS', smarthomes: 'AGENT_ID_SMARTHOMES', reception: 'AGENT_ID_RECEPTION',
-    };
+/* ═══════════════════ معرّفات الوكلاء على ElevenLabs ═══════════════════ */
+const AGENT_IDS = {
+  fahim:      'agent_fahim_placeholder',
+  network:    'agent_network_placeholder',
+  systems:    'agent_systems_placeholder',
+  apps:       'agent_apps_placeholder',
+  bim:        'agent_bim_placeholder',
+  trainer:    'agent_trainer_placeholder',
+  robotics:   'agent_robotics_placeholder',
+  smarthomes: 'agent_smarthomes_placeholder',
+  reception:  'agent_reception_placeholder'
+};
 
-    /* كلمات مفتاحية للكشف عن التحويل من نص الوكيل */
-    const TRANSFER_KEYWORDS = {
-      'فهيم': 'fahim', 'المنسق': 'fahim', 'المنسّق': 'fahim',
-      'مسؤول الشبكات': 'network', 'مسؤولة الشبكات': 'network', 'قسم الشبكات': 'network', 'إدارة الشبكات': 'network',
-      'مسؤول الأنظمة': 'systems', 'مسؤولة الأنظمة': 'systems', 'قسم الأنظمة': 'systems',
-      'مسؤولة التطبيقات': 'apps', 'مسؤول التطبيقات': 'apps', 'قسم التطبيقات': 'apps',
-      'مسؤول الـ BIM': 'bim', 'مسؤول البيم': 'bim', 'مسؤول bim': 'bim', 'قسم البيم': 'bim',
-      'المدرّبة التقنية': 'trainer', 'المدربة التقنية': 'trainer', 'قسم التدريب': 'trainer',
-      'وكيل الروبوتات': 'robotics', 'وكيلة الروبوتات': 'robotics', 'الروبوتات الإنشائية': 'robotics',
-      'وكيلة البيوت الذكية': 'smarthomes', 'وكيل البيوت الذكية': 'smarthomes', 'البيوت الذكية': 'smarthomes',
-      'أبو راشد': 'reception', 'ابو راشد': 'reception', 'الاستقبال': 'reception',
-    };
+/* ═══════════════════ كلمات مفتاحية للتحويل (C2 fix: تقليل سكربت فهيم) ═══════════════════ */
+const TRANSFER_KEYWORDS = {
+  network:    ['شبكة','شبكات','واي فاي','wifi','wi-fi','إنترنت','انترنت','راوتر','router','vlan','اتصال','نت','كيبل','كابل','switch','سويتش','firewall','جدار حماية','vpn','dns','ip'],
+  systems:    ['نظام','أنظمة','انظمة','خادم','سيرفر','server','windows','linux','ويندوز','لينكس','active directory','ad','نسخ احتياطي','backup','virtualization','hyper-v','vmware','تخزين','storage','raid'],
+  apps:       ['تطبيق','تطبيقات','برنامج','برامج','revit','autocad','اوتوكاد','أوتوكاد','navisworks','تثبيت','installation','license','رخصة','ترخيص','تحديث','update','crash','يعلق','بطء','office','اوفيس'],
+  bim:        ['bim','بيم','نمذجة','lod','clash','ifc','navisworks','revit family','مشروع تنفيذي','as-built','4d','5d','coordination','تنسيق نماذج'],
+  trainer:    ['تدريب','تدريبات','دورة','دورات','تأهيل','مهارات','تعليم','ورشة','ورش','workshop','training','onboarding','الموظفين الجدد'],
+  robotics:   ['روبوت','روبوتات','أتمتة','اتمتة','automation','3d printing','طباعة ثلاثية','طباعة الخرسانة','drone','درون','طائرة','مسح ضوئي','scan','laser scan'],
+  smarthomes: ['بيت ذكي','منزل ذكي','بيوت ذكية','smart home','iot','matter','zigbee','z-wave','homekit','google home','alexa','إضاءة ذكية','مستشعر','sensor','اوتوميشن منزلي'],
+  reception:  ['سنترال','مكالمة','مكالمات','استقبال','تحويل مكالمة','call','phone','هاتف','رد آلي','ivr','pbx','voip','sip','3cx']
+};
 
-    /* 🆕 FIX C1: خريطة كلمات نية المستخدم → الوكيل المتخصّص */
-    const USER_INTENT_KEYWORDS = {
-      network:    ['شبكة','شبكات','wifi','wi-fi','إنترنت','vpn','جدار','جدران نارية','راوتر','سويتش','sd-wan','dns'],
-      systems:    ['سيرفر','خادم','خوادم','سيرفرات','windows server','linux','نسخ احتياطي','backup','azure','نظام تشغيل'],
-      apps:       ['تثبيت','تثبيت برنامج','برنامج','تطبيق','erp','crm','قاعدة بيانات','sql','تكامل','api'],
-      bim:        ['bim','revit','نمذجة','نموذج','lod','bim 360','navisworks','autodesk','bim manager'],
-      trainer:    ['تدريب','تدرّبون','تدربون','دورة','كورس','موظف جديد','منهج','محتوى تدريبي','workshop'],
-      robotics:   ['طائرة','طائرات','مسيّرة','مسيرة','درون','drone','ليزر','مسح ليزري','طباعة 3d','طباعة ثلاثية','خرسانة','روبوت','روبوتات'],
-      smarthomes: ['ذكي','بيت ذكي','بيوت ذكية','فيلا','فلل','iot','knx','matter','أتمتة','إضاءة ذكية','tuya','zigbee'],
-      reception:  ['سنترال','هاتف','مكالمة','مكالمات','استقبال','زائر','تحويل المكالمة','الكاونتر'],
-    };
+/* ═══════════════════ C1 fix: نوايا المستخدم لاكتشاف نوع السؤال ═══════════════════ */
+const USER_INTENT_KEYWORDS = {
+  greeting:   ['مرحبا','مرحبًا','اهلا','أهلا','أهلًا','السلام','هلا','هاي','hi','hello'],
+  whoAreYou:  ['من انت','من أنت','من حضرتك','تعرف بنفسك','عرف نفسك','عرّف نفسك','مين انت'],
+  whatDoYouDo:['ماذا تفعل','وش تسوي','ايش تشتغل','شو شغلك','ما هو دورك','ما دورك','وش دورك','ايش وظيفتك'],
+  thanks:     ['شكرا','شكرًا','مشكور','يعطيك العافية','تسلم','thanks','thank you'],
+  bye:        ['وداعا','مع السلامة','الى اللقاء','إلى اللقاء','باي','bye','goodbye']
+};
 
-    /* 🆕 FIX C1: ردود متخصّصة قصيرة لكل وكيل عند سؤال داخل تخصصه */
-    const AGENT_RESPONSES = {
-      fahim:      'شكراً على سؤالك. دعني أوجّهك للمتخصّص الأنسب.',
-      network:    'سؤال ممتاز عن الشبكات. بنيتنا تعتمد SD-WAN مع نسخ احتياطي LTE وجدران نارية متعدّدة الطبقات.',
-      systems:    'بخصوص الأنظمة: لدينا بيئة هجينة (On-prem + Azure) مع نسخ احتياطي يومي ومراقبة 24/7.',
-      apps:       'بالنسبة للتطبيقات: نعتمد ERP متكاملاً مع CRM مخصّص، وكل التثبيتات تتم عبر فريق التطبيقات.',
-      bim:        'في الـBIM: نعمل على Revit + BIM 360 بمستوى LOD 400 للنماذج التنفيذية.',
-      trainer:    'برامج التدريب لدينا مُصمَّمة بحسب القسم والمستوى، وفيها مسارات أساسية ومتقدّمة.',
-      robotics:   'في الروبوتات الإنشائية: نُشغّل أسطول طائرات مسيّرة وماسحات ليزرية ترفع تقارير يومية مقارنة بـBIM.',
-      smarthomes: 'في البيوت الذكية: ننفّذ منظومة Matter/KNX موحّدة عبر تطبيق واحد للمقيم.',
-      reception:  'يا هلا والله! نوجّه المكالمات والزوّار لكل قسم بكفاءة، وأي استفسار أنا له.',
-    };
+/* ═══════════════════ C1 fix: ردود الوكلاء حسب نوع السؤال ═══════════════════ */
+const AGENT_RESPONSES = {
+  network: {
+    greeting:    'أهلًا وسهلًا. أنا مسؤول الشبكات في القصواء. كيف أقدر أخدمك في موضوع الشبكة؟',
+    whoAreYou:   'أنا مسؤول الشبكات. أتولى تصميم وتشغيل البنية التحتية للشبكات في مشاريع القصواء، من الراوترات والسويتشات إلى الـ VLANs والـ Firewalls.',
+    whatDoYouDo: 'أتابع أداء الشبكة، وأضمن استمراريتها، وأتعامل مع مشاكل الاتصال والـ Wi-Fi، وأدير الـ VLANs وقواعد الجدار الناري وربط المواقع البعيدة عبر VPN.',
+    thanks:      'العفو. تحت أمرك في أي وقت.',
+    bye:         'مع السلامة. متى احتجت أي استفسار عن الشبكات تواصل معنا.',
+    default:     'بخصوص الشبكات في القصواء: نعتمد بنية متعددة الطبقات مع VLANs لكل قسم، وفيها مراقبة دائمة للأداء وإجراءات استرجاع سريعة عند الانقطاع. هل تحب أوضّح لك جانبًا محددًا؟'
+  },
+  systems: {
+    greeting:    'أهلًا بك. أنا مسؤول الأنظمة. كيف أقدر أساعدك؟',
+    whoAreYou:   'أنا مسؤول الأنظمة في القصواء. أدير الخوادم وأنظمة التشغيل، والـ Active Directory، وحلول النسخ الاحتياطي والتعافي من الكوارث.',
+    whatDoYouDo: 'أتابع صحة الخوادم، وأدير صلاحيات المستخدمين عبر Active Directory، وأشغّل بيئات الـ Virtualization، وأضمن جاهزية النسخ الاحتياطية واسترجاعها وقت الحاجة.',
+    thanks:      'على الرحب والسعة.',
+    bye:         'إلى اللقاء.',
+    default:     'لضمان عدم توقف الخوادم نعتمد على: تكرار العتاد (Redundancy)، ومراقبة 24/7، ونسخ احتياطية يومية على مواقع متعددة، وخطة استرجاع مختبرة دوريًا. تحب نفصّل أكثر؟'
+  },
+  apps: {
+    greeting:    'أهلًا. أنا مسؤولة التطبيقات. تفضل بسؤالك.',
+    whoAreYou:   'أنا مسؤولة التطبيقات في القصواء. مسؤولة عن نشر وتثبيت ودعم التطبيقات الهندسية والإدارية، مثل Revit وAutoCAD وNavisworks وحزمة Office.',
+    whatDoYouDo: 'أتولى تثبيت التراخيص وإدارتها، وحل مشاكل التطبيقات، ومتابعة التحديثات، وتقديم الدعم الفني للمستخدمين في القصواء.',
+    thanks:      'تسلم. بالخدمة دائمًا.',
+    bye:         'مع السلامة.',
+    default:     'بالنسبة لتثبيت Revit: نوزّعه عبر سيرفر التراخيص الموحد بحيث ما يحتاج المستخدم يدخل أي مفتاح يدويًا. لو تواجه مشكلة معينة في التثبيت، اذكر لي رسالة الخطأ بالضبط.'
+  },
+  bim: {
+    greeting:    'أهلًا بك. أنا مسؤول الـ BIM.',
+    whoAreYou:   'أنا مسؤول الـ BIM في القصواء. أدير منهجية النمذجة المعلوماتية للمباني، ومستويات التطوير LOD، وتنسيق النماذج بين التخصصات.',
+    whatDoYouDo: 'أضع معايير النمذجة، وأدير عمليات Clash Detection بين التخصصات، وأنسّق نماذج Revit عبر Navisworks، وأتأكد من توافق المخرجات مع متطلبات IFC.',
+    thanks:      'العفو.',
+    bye:         'إلى اللقاء.',
+    default:     'في القصواء نعتمد عمومًا LOD 300 للمرحلة التصميمية، وLOD 350 للتنسيق بين التخصصات، وLOD 400 للمراحل التنفيذية وLOD 500 للنماذج كما نُفِّذت (As-Built). تحب أتوسع في مرحلة معينة؟'
+  },
+  trainer: {
+    greeting:    'مرحبًا بك. أنا المدرّبة التقنية.',
+    whoAreYou:   'أنا المدرّبة التقنية في القصواء. مسؤولة عن تأهيل الموظفين الجدد وتطوير مهارات الفرق على البرامج والأدوات الهندسية.',
+    whatDoYouDo: 'أُعدّ خطط التدريب، وأقدّم ورش عمل دورية على Revit وBIM وأدوات الإنتاجية، وأتابع مستوى الإتقان عبر تقييمات عملية.',
+    thanks:      'تسلم.',
+    bye:         'إلى اللقاء.',
+    default:     'تدريب الموظفين الجدد يمر بثلاث مراحل: تعريف بالشركة وأنظمتها، ثم تدريب عملي على الأدوات الهندسية لأسبوعين، ثم متابعة على مشاريع حقيقية تحت إشراف زميل أقدم.'
+  },
+  robotics: {
+    greeting:    'أهلًا بك. أنا وكيل الروبوتات الإنشائية.',
+    whoAreYou:   'أنا وكيل الروبوتات الإنشائية في القصواء. أتابع أحدث تقنيات الأتمتة في البناء، من طباعة الخرسانة ثلاثية الأبعاد إلى الدرونز والمسح الضوئي بالليزر.',
+    whatDoYouDo: 'أدرس جدوى الروبوتات في مشاريعنا، وأشرف على تجارب طباعة الخرسانة ثلاثية الأبعاد، ومسوحات الموقع بالدرونز، وأتمتة بعض مهام التشطيب.',
+    thanks:      'بالخدمة.',
+    bye:         'مع السلامة.',
+    default:     'طباعة الخرسانة ثلاثية الأبعاد فيها فرص ممتازة لتقليل وقت التنفيذ والهدر، خصوصًا في الجدران غير المتكررة. لكن تحتاج خلطات خاصة وتصميمًا متوافقًا مع حركة الذراع. تحب نفصّل في جانب معين؟'
+  },
+  smarthomes: {
+    greeting:    'أهلًا بك. أنا وكيلة البيوت الذكية.',
+    whoAreYou:   'أنا وكيلة البيوت الذكية في القصواء. متخصصة في دمج تقنيات IoT في الفلل والمشاريع السكنية.',
+    whatDoYouDo: 'أصمّم منظومات البيوت الذكية بمعيار Matter وZigbee، من إضاءة ومستشعرات وتكييف، وأربطها بمنصات HomeKit وGoogle Home وAlexa.',
+    thanks:      'العفو.',
+    bye:         'إلى اللقاء.',
+    default:     'نعم، نعتمد Matter كمعيار أساسي في فلل القصواء لأنه يضمن توافق الأجهزة عبر مختلف المنصات (Apple وGoogle وSamsung)، ويبسّط على المالك إدارة منزله من تطبيق واحد.'
+  },
+  reception: {
+    greeting:    'أهلًا وسهلًا. معك أبو راشد من الاستقبال.',
+    whoAreYou:   'أنا أبو راشد، مسؤول الاستقبال والسنترال في القصواء. أستقبل المكالمات وأحوّلها للقسم المختص.',
+    whatDoYouDo: 'أرد على مكالمات الشركة، وأحوّلها للجهة المعنية عبر منظومة 3CX، وأتابع الرسائل الصوتية والمواعيد.',
+    thanks:      'تسلم. بالخدمة.',
+    bye:         'مع السلامة.',
+    default:     'نعم، عندنا منظومة سنترال متكاملة على 3CX تربط جميع فروع القصواء، وفيها رد آلي IVR يوجّه المتصل لأقرب موظف مختص. تحب أحوّلك لقسم معين؟'
+  }
+};
 
-    /* 📋 بيانات عرض الوكلاء */
-    const AGENTS_META = {
-      fahim:      { name:'فهيم',                role:'المنسّق الرئيسي',     icon:'🧠', desc:'يستقبل أسئلتك ويحوّلك للمتخصص المناسب' },
-      network:    { name:'مسؤول الشبكات',       role:'Network Engineer',    icon:'🌐', desc:'شبكات، VPN، Wi-Fi، جدران نارية' },
-      systems:    { name:'مسؤول الأنظمة',       role:'Systems Administrator', icon:'🖥️', desc:'سيرفرات، أنظمة تشغيل، نسخ احتياطي' },
-      apps:       { name:'مسؤولة التطبيقات',    role:'Application Manager', icon:'💼', desc:'ERP، CRM، قواعد بيانات، تكاملات' },
-      bim:        { name:'مسؤول الـ BIM',       role:'BIM Manager',         icon:'🏗️', desc:'نمذجة المباني، Revit، BIM 360' },
-      trainer:    { name:'المدرّبة التقنية',    role:'Tech Trainer',        icon:'📚', desc:'تدريب الموظفين، المناهج الت
+/* ═══════════════════ بيانات بطاقات الوكلاء ═══════════════════ */
+const AGENTS_META = [
+  { id:'network',    name:'مسؤول الشبكات',          role:'Network Engineer',    icon:'🌐' },
+  { id:'systems',    name:'مسؤول الأنظمة',          role:'Systems Administrator', icon:'🖥️' },
+  { id:'apps',       name:'مسؤولة التطبيقات',       role:'Applications Lead',   icon:'💼' },
+  { id:'fahim',      name:'فهيم — المنسّق',         role:'Coordinator',         icon:'🤝' },
+  { id:'bim',        name:'مسؤول الـ BIM',           role:'BIM Manager',         icon:'🏗️' },
+  { id:'trainer',    name:'المدرّبة التقنية',        role:'Technical Trainer',   icon:'🎓' },
+  { id:'robotics',   name:'وكيل الروبوتات الإنشائية',role:'Construction Robotics',icon:'🤖' },
+  { id:'smarthomes', name:'وكيلة البيوت الذكية',     role:'Smart Homes',         icon:'🏠' },
+  { id:'reception',  name:'أبو راشد — الاستقبال',    role:'Reception',           icon:'📞' }
+];
+
+/* ═══════════════════ سكربتات المحاكاة (C2 fix: تقليل سكربت فهيم) ═══════════════════ */
+const SIM_SCRIPTS = {
+  fahim: [
+    { delay: 1200, role:'agent', text:'السلام عليكم. أنا فهيم، منسّق منظومة الوكلاء في القصواء للتطوير العقاري. تحت أمرك بأي استفسار.' }
+  ]
+};
+
+/* ═══════════════════ حالة التطبيق ═══════════════════ */
+let activeAgentId   = 'fahim';
+let sessionStarted  = false;
+let simulationMode  = true;
+let micMuted        = false;
+let lastUserMsg     = '';
+let simTimers       = [];
+let convAPI         = null;
+
+/* ═══════════════════ C3 fix: تعريف __syncConvAPI ═══════════════════ */
+window.__syncConvAPI = function() {
+  if (window.ElevenLabsConvAI) {
+    convAPI = window.ElevenLabsConvAI;
+    console.log('[ConvAI] SDK جاهز.');
+  }
+};
+
+/* ═══════════════════ بناء البطاقات ═══════════════════ */
+function buildGrid() {
+  const grid = document.getElementById('agentGrid');
+  grid.innerHTML = '';
+  AGENTS_META.forEach(a => {
+    const card = document.createElement('button');
+    card.className = 'agent-card' + (a.id === 'fahim' ? ' fahim active' : '');
+    card.dataset.id = a.id;
+    card.setAttribute('aria-label', a.name);
+    card.innerHTML = `
+      <div class="agent-avatar">${a.icon}</div>
+      <div class="agent-name">${a.name}</div>
+      <div class="agent-role">${a.role}</div>
+      <div class="agent-status"><span class="dot"></span><span class="status-text">جاهز</span></div>
+    `;
+    card.addEventListener('click', () => onCardClick(a.id));
+    grid.appendChild(card);
+  });
+}
+
+function setActiveCard(id) {
+  document.querySelectorAll('.agent-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.id === id);
+    const dot = c.querySelector('.dot');
+    const txt = c.querySelector('.status-text');
+    if (c.dataset.id === id) {
+      dot.style.background = 'var(--ok)';
+      txt.textContent = 'نشط';
+    } else {
+      dot.style.background = 'var(--muted)';
+      txt.textContent = 'جاهز';
+    }
+  });
+  activeAgentId = id;
+}
+
+function clearAllCards() {
+  document.querySelectorAll('.agent-card').forEach(c => {
+    c.classList.remove('active');
+    c.querySelector('.dot').style.background = 'var(--muted)';
+    c.querySelector('.status-text').textContent = 'جاهز';
+  });
+}
+
+/* ═══════════════════ شريط الحالة والنص ═══════════════════ */
+function setStatus(text, color) {
+  const el = document.getElementById('statusText');
+  el.textContent = text;
+  el.style.color = color || 'var(--ink)';
+}
+
+function addTranscript(role, text) {
+  const box = document.getElementById('transcript');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = `<strong>${role === 'agent' ? 'الوكيل' : 'أنت'}:</strong> ${escHtml(text)}`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function escHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ═══════════════════ منطق التحويل ═══════════════════ */
+function detectTransfer(text) {
+  const t = String(text).toLowerCase();
+  let best = null, bestScore = 0;
+  for (const [agent, words] of Object.entries(TRANSFER_KEYWORDS)) {
+    let score = 0;
+    for (const w of words) if (t.includes(w.toLowerCase())) score++;
+    if (score > bestScore) { bestScore = score; best = agent; }
+  }
+  return bestScore > 0 ? best : null;
+}
+
+function detectIntent(text) {
+  const t = String(text).toLowerCase().trim();
+  if (!t) return null;
+  for (const [intent, words] of Object.entries(USER_INTENT_KEYWORDS)) {
+    for (const w of words) if (t.includes(w.toLowerCase())) return intent;
+  }
+  return null;
+}
+
+async function executeTransfer(targetId) {
+  const meta = AGENTS_META.find(a => a.id === targetId);
+  if (!meta) return;
+  const overlay = document.getElementById('transferOverlay');
+  overlay.querySelector('.transfer-text').textContent = `جاري التحويل إلى: ${meta.name}…`;
+  overlay.classList.add('show');
+  await sleep(900);
+  overlay.classList.remove('show');
+  setActiveCard(targetId);
+  setStatus(`متّصل مع: ${meta.name}`, 'var(--ok)');
+  addTranscript('agent', `تحويلك للوكيل ${meta.name}.`);
+}
+
+/* ═══════════════════ إدارة الجلسة ═══════════════════ */
+function startSession() {
+  sessionStarted = true;
+  document.getElementById('startScreen').style.display = 'none';
+  setStatus('الجلسة نشطة', 'var(--ok)');
+  if (simulationMode) {
+    document.getElementById('simBadge').classList.add('show');
+    document.getElementById('simInputBar').classList.add('show');
+    startSimulation('fahim');
+  }
+}
+
+function endCurrentSession() {
+  clearSimTimers();
+  sessionStarted = false;
+  setActiveCard('fahim');
+  document.getElementById('simBadge').classList.remove('show');
+  document.getElementById('simInputBar').classList.remove('show');
+  document.getElementById('transcript').innerHTML = '';
+  setStatus('غير متصل', 'var(--muted)');
+}
+
+function startSimulation(agentId) {
+  clearSimTimers();
+  const script = SIM_SCRIPTS[agentId];
+  if (!script) return;
+  script.forEach(line => {
+    const t = setTimeout(() => addTranscript(line.role, line.text), line.delay);
+    simTimers.push(t);
+  });
+}
+
+function clearSimTimers() {
+  simTimers.forEach(t => clearTimeout(t));
+  simTimers = [];
+}
+
+/* ═══════════════════ إدخال المحاكاة ═══════════════════ */
+function simInputKeydown(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    sendSimInput();
+  }
+}
+
+/* ═══════════════════ C1 fix: ردود حسب النية والمحتوى ═══════════════════ */
+function sendSimInput() {
+  const input = document.getElementById('simInput');
+  const text = input.value.trim();
+  if (!text) return;
+  lastUserMsg = text;
+  addTranscript('user', text);
+  input.value = '';
+
+  const target = detectTransfer(text);
+  const intent = detectIntent(text);
+
+  if (activeAgentId === 'fahim') {
+    if (target) {
+      setTimeout(() => executeTransfer(target), 700);
+      setTimeout(() => {
+        const resp = AGENT_RESPONSES[target];
+        if (!resp) return;
+        const reply = resp[intent] || resp.default;
+        addTranscript('agent', reply);
+      }, 1900);
+    } else if (intent) {
+      const replies = {
+        greeting:    'وعليكم السلام. أنا فهيم منسّق وكلاء القصواء. كيف أقدر أوجّهك؟',
+        whoAreYou:   'أنا فهيم، المنسّق العام لمنظومة وكلاء القصواء للتطوير العقاري.',
+        whatDoYouDo: 'أستقبل استفساراتك وأحوّلك للوكيل المختص: شبكات، أنظمة، تطبيقات، BIM، تدريب، روبوتات، بيوت ذكية، أو الاستقبال.',
+        thanks:      'العفو، تحت أمرك.',
+        bye:         'مع السلامة.'
+      };
+      setTimeout(() => addTranscript('agent', replies[intent] || 'تفضّل بسؤالك.'), 700);
+    } else {
+      setTimeout(() => addTranscript('agent', 'لم أتعرّف على تخصص واضح في سؤالك. تحب أحوّلك لـ: الشبكات، الأنظمة، التطبيقات، BIM، التدريب، الروبوتات، البيوت الذكية، أو الاستقبال؟'), 700);
+    }
+  } else {
+    const resp = AGENT_RESPONSES[activeAgentId];
+    if (!resp) return;
+    setTimeout(() => addTranscript('agent', resp[intent] || resp.default), 700);
+  }
+}
+
+/* ═══════════════════ بدء العرض ═══════════════════ */
+function startPresentation() {
+  startSession();
+}
+
+/* ═══════════════════ العودة لفهيم ═══════════════════ */
+function returnToFahim() {
+  lastUserMsg = '';
+  clearSimTimers();
+  setActiveCard('fahim');
+  setStatus('متّصل مع: فهيم — المنسّق', 'var(--ok)');
+  addTranscript('agent', 'رجعنا لفهيم. كيف أقدر أساعدك؟');
+}
+
+/* ═══════════════════ C4 fix: إنهاء وإعادة الإقلاع ═══════════════════ */
+function endConversation() {
+  if (!confirm('هل تريد إنهاء الحوار؟')) return;
+  endCurrentSession();
+  document.getElementById('startScreen').style.display = 'flex';
+}
+
+/* ═══════════════════ كتم/تشغيل المايك ═══════════════════ */
+function toggleMic() {
+  micMuted = !micMuted;
+  const btn = document.getElementById('micBtn');
+  btn.textContent = micMuted ? '🔇 المايك مكتوم' : '🎤 تشغيل المايك';
+  showToast(micMuted ? 'تم كتم المايك' : 'تم تشغيل المايك');
+}
+
+/* ═══════════════════ ضغط بطاقة ═══════════════════ */
+function onCardClick(id) {
+  if (!sessionStarted) {
+    showToast('ابدأ الجلسة أولًا');
+    return;
+  }
+  if (id === activeAgentId) return;
+  executeTransfer(id);
+}
+
+/* ═══════════════════ تبديل وضع المحاكاة ═══════════════════ */
+function toggleSimMode() {
+  simulationMode = !simulationMode;
+  const badge = document.getElementById('simBadge');
+  const bar   = document.getElementById('simInputBar');
+  if (simulationMode && sessionStarted) {
+    badge.classList.add('show');
+    bar.classList.add('show');
+    hideError();
+  } else {
+    badge.classList.remove('show');
+    bar.classList.remove('show');
+  }
+  showToast(simulationMode ? 'وضع المحاكاة مفعّل' : 'وضع المحاكاة معطّل');
+}
+
+/* ═══════════════════ C5 fix: لا يظهر بانر الانقطاع في وضع المحاكاة ═══════════════════ */
+function showError(msg) {
+  if (!sessionStarted || simulationMode) return;
+  const banner = document.getElementById('errorBanner');
+  banner.querySelector('.error-text').textContent = msg || 'انقطع الاتصال.';
+  banner.classList.add('show');
+}
+
+function hideError() {
+  document.getElementById('errorBanner').classList.remove('show');
+}
+
+function retryConnection() {
+  hideError();
+  showToast('جاري إعادة المحاولة…');
+}
+
+/* ═══════════════════ Toast ═══════════════════ */
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+/* ═══════════════════ DOMContentLoaded ═══════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  buildGrid();
+  setActiveCard('fahim');
+  setStatus('غير متصل', 'var(--muted)');
+
+  document.getElementById('startBtn').addEventListener('click', startPresentation);
+  document.getElementById('returnBtn').addEventListener('click', returnToFahim);
+  document.getElementById('endBtn').addEventListener('click', endConversation);
+  document.getElementById('micBtn').addEventListener('click', toggleMic);
+  document.getElementById('simToggle').addEventListener('change', toggleSimMode);
+  document.getElementById('retryBtn').addEventListener('click', retryConnection);
+  document.getElementById('sendBtn').addEventListener('click', sendSimInput);
+  document.getElementById('simInput').addEventListener('keydown', simInputKeydown);
+
+  console.log('[App] جاهز. وضع المحاكاة:', simulationMode);
+});
+</script>
+</body>
+</html>
