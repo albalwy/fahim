@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منظومة الوكلاء الذكية — القصواء للتطوير العقاري</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ════════════════════════════════
+       متغيرات التصميم
+    ════════════════════════════════ */
+    :root {
+      --navy:          #1A3152;
+      --navy-dark:     #0F1E33;
+      --navy-mid:      #234072;
+      --gold:          #C9A84C;
+      --gold-light:    #E8C97A;
+      --gold-dim:      rgba(201,168,76,0.18);
+      --bg:            #ECF0F6;
+      --card-bg:       #FFFFFF;
+      --card-border:   #D8E0EC;
+      --text-h:        #111E30;
+      --text-b:        #4A6080;
+      --text-light:    #8099B8;
+      --inactive-op:   0.32;
+      --radius:        14px;
+      --radius-sm:     8px;
+      --transition:    all 0.38s cubic-bezier(0.4,0,0.2,1);
+      --shadow-card:   0 2px 12px rgba(26,49,82,0.09);
+      --shadow-active: 0 6px 28px rgba(201,168,76,0.38), 0 0 0 2px var(--gold);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Tajawal', sans-serif;
+      background: var(--bg);
+      color: var(--text-h);
+    }
+
+    /* ════════════════════════════════
+       شاشة البداية
+    ════════════════════════════════ */
+    #startScreen {
+      position: fixed; inset: 0;
+      background: linear-gradient(160deg, var(--navy-dark) 0%, var(--navy) 60%, #1e4070 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 20px; z-index: 200;
+      transition: opacity 0.5s ease;
+    }
+    #startScreen.fade-out { opacity: 0; pointer-events: none; }
+    #startScreen.hidden    { display: none; }
+
+    .start-emblem { font-size: 3.6rem; line-height: 1; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4)); }
+
+    .start-title {
+      color: #fff;
+      font-size: 1.85rem; font-weight: 800;
+      text-align: center; letter-spacing: -0.3px;
+    }
+    .start-divider {
+      width: 60px; height: 3px;
+      background: var(--gold); border-radius: 2px;
+    }
+    .start-subtitle {
+      color: var(--gold-light); font-size: 0.95rem;
+      text-align: center; line-height: 1.7;
+      max-width: 380px;
+    }
+    .start-btn {
+      margin-top: 8px;
+      padding: 15px 44px;
+      background: var(--gold);
+      color: #fff; font-family: 'Tajawal', sans-serif;
+      font-size: 1.05rem; font-weight: 700;
+      border: none; border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 30px rgba(201,168,76,0.55);
+      transition: var(--transition);
+    }
+    .start-btn:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 10px 36px rgba(201,168,76,0.65); }
+
+    .sim-toggle-wrap { margin-top: 4px; }
+    .sim-toggle-btn {
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.38); font-family: 'Tajawal', sans-serif;
+      font-size: 0.78rem; text-decoration: underline; transition: color 0.2s;
+    }
+    .sim-toggle-btn:hover { color: rgba(255,255,255,0.65); }
+    .sim-toggle-btn.on { color: #FF8C42; }
+
+    /* ════════════════════════════════
+       رأس الصفحة
+    ════════════════════════════════ */
+    #appHeader {
+      background: var(--navy);
+      padding: 0 20px;
+      height: 58px;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.28);
+      flex-shrink: 0;
+    }
+
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-logo {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 800; color: #fff;
+      flex-shrink: 0;
+    }
+    .brand-name  { color: #fff;         font-size: 1rem;  font-weight: 700; line-height: 1.2; }
+    .brand-sub   { color: var(--gold);  font-size: 0.7rem; font-weight: 400; }
+
+    /* شريط الحالة */
+    .status-capsule {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50px; padding: 7px 16px;
+    }
+    #activeAgentName { color: #fff; font-size: 0.88rem; font-weight: 600; min-width: 80px; text-align: center; }
+    .status-pill {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; color: rgba(255,255,255,0.7);
+    }
+    .s-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #555; transition: background 0.3s;
+    }
+    .s-dot.idle        { background: #556; }
+    .s-dot.listening   { background: #4CAF50; animation: pulse-g 1.6s infinite; }
+    .s-dot.speaking    { background: var(--gold); animation: pulse-d 1.4s infinite; }
+    .s-dot.transferring{ background: #42A5F5; animation: pulse-b 0.7s infinite; }
+
+    /* ════════════════════════════════
+       تخطيط الصفحة الرئيسية
+    ════════════════════════════════ */
+    #appMain {
+      height: calc(100vh - 58px);
+      display: flex; flex-direction: column;
+      padding: 14px 18px 12px;
+      gap: 12px; overflow: hidden;
+    }
+
+    /* ════════════════════════════════
+       شبكة الوكلاء 3×3
+    ════════════════════════════════ */
+    #agentsGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 11px;
+      flex: 1; min-height: 0;
+    }
+
+    .agent-card {
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 14px 10px 12px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 6px;
+      text-align: center;
+      position: relative; overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition);
+      opacity: var(--inactive-op);
+      box-shadow: var(--shadow-card);
+      user-select: none;
+    }
+
+    /* الشريط العلوي الملون */
+    .agent-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--gold);
+      transform: scaleX(0); transform-origin: right;
+      transition: transform 0.38s ease;
+    }
+
+    /* حالة: متاح (الجلسة بدأت لكن ليس النشط) */
+    .agent-card.available {
+      opacity: 0.58;
+    }
+    .agent-card.available:hover {
+      opacity: 0.82;
+      border-color: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(201,168,76,0.2);
+    }
+
+    /* حالة: نشط */
+    .agent-card.active {
+      opacity: 1;
+      border-color: var(--gold);
+      box-shadow: var(--shadow-active);
+      transform: scale(1.025) translateY(-1px);
+    }
+    .agent-card.active::before { transform: scaleX(1); }
+
+    /* انيميشن الخروج عند التحويل */
+    .agent-card.leaving {
+      animation: card-leave 0.42s forwards;
+    }
+    /* انيميشن الدخول عند التحويل */
+    .agent-card.entering {
+      animation: card-enter 0.42s forwards;
+    }
+
+    .card-badge {
+      position: absolute; top: 8px; left: 8px;
+      width: 9px; height: 9px; border-radius: 50%;
+      transition: var(--transition);
+    }
+    .agent-card.active .card-badge {
+      background: var(--gold);
+      box-shadow: 0 0 6px var(--gold);
+    }
+
+    .card-icon  { font-size: 1.8rem; line-height: 1; }
+    .card-name  { font-size: 0.88rem; font-weight: 700; color: var(--text-h); line-height: 1.2; }
+    .card-role  { font-size: 0.68rem; color: var(--text-b); line-height: 1.3; }
+    .card-desc  { font-size: 0.64rem; color: var(--text-light); line-height: 1.3; margin-top: 1px; }
+
+    /* ════════════════════════════════
+       شريط التحكم
+    ════════════════════════════════ */
+    #controlsBar {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      box-shadow: var(--shadow-card);
+      flex-shrink: 0;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px;
+      border: none; border-radius: 50px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+      white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.42; cursor: not-allowed; transform: none !important; }
+
+    .btn-navy   { background: var(--navy);    color: #fff; }
+    .btn-navy:not(:disabled):hover   { background: var(--navy-mid); transform: translateY(-1px); }
+
+    .btn-danger { background: #DC3545; color: #fff; }
+    .btn-danger:not(:disabled):hover { background: #c82333; transform: translateY(-1px); }
+
+    .btn-mic {
+      width: 42px; height: 42px; padding: 0;
+      border-radius: 50%; font-size: 1.1rem;
+      background: #F0F4FA;
+      border: 2px solid var(--card-border);
+      cursor: pointer; transition: var(--transition);
+      margin-right: auto; /* يدفع بقية الأزرار لليمين في RTL */
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-mic:hover { border-color: var(--gold); }
+    .btn-mic.muted { background: #FFF0F0; border-color: #DC3545; }
+    .btn-mic.live  { background: #F0FFF4; border-color: #4CAF50; }
+
+    /* ════════════════════════════════
+       لوحة الـ Transcript
+    ════════════════════════════════ */
+    #transcriptPanel {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      max-height: 120px; min-height: 60px;
+      overflow-y: auto;
+      box-shadow: var(--shadow-card);
+      flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 5px;
+      scroll-behavior: smooth;
+    }
+    #transcriptPanel:empty::before {
+      content: 'سيظهر هنا نص الحوار حين يبدأ...';
+      color: var(--text-light); font-size: 0.8rem;
+    }
+    .tr-row {
+      display: flex; gap: 8px;
+      font-size: 0.78rem; line-height: 1.45;
+      animation: fadeup 0.25s ease;
+    }
+    .tr-who { font-weight: 700; flex-shrink: 0; min-width: 70px; }
+    .tr-who.user    { color: var(--navy); }
+    .tr-who.agent   { color: var(--gold); }
+    .tr-who.system  { color: var(--text-light); font-style: italic; }
+    .tr-text        { color: var(--text-h); }
+    .tr-text.system { color: var(--text-light); font-style: italic; }
+
+    /* ════════════════════════════════
+       طبقة التحويل (Overlay)
+    ════════════════════════════════ */
+    #transferOverlay {
+      position: fixed; inset: 0;
+      background: rgba(15, 30, 51, 0.82);
+      backdrop-filter: blur(6px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 150;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    #transferOverlay.show { opacity: 1; pointer-events: all; }
+
+    .transfer-box {
+      text-align: center;
+      animation: float 2s ease-in-out infinite;
+    }
+    .transfer-icon-wrap {
+      font-size: 3.2rem; margin-bottom: 18px;
+      display: inline-block;
+      animation: spin-slow 2.5s linear infinite;
+    }
+    .transfer-title {
+      color: #fff; font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;
+    }
+    .transfer-sub { color: var(--gold-light); font-size: 0.92rem; }
+
+    /* ════════════════════════════════
+       لافتة الخطأ
+    ════════════════════════════════ */
+    #errorBanner {
+      position: fixed; top: 58px; left: 0; right: 0;
+      background: #DC3545; color: #fff;
+      text-align: center; padding: 9px 16px;
+      font-size: 0.85rem; font-weight: 600;
+      z-index: 130; display: none;
+    }
+    #errorBanner.show { display: flex; align-items: center; justify-content: center; gap: 12px; }
+    #errorBanner button {
+      background: #fff; color: #DC3545;
+      border: none; border-radius: 20px;
+      padding: 4px 14px; font-family: 'Tajawal', sans-serif;
+      font-weight: 700; font-size: 0.82rem; cursor: pointer;
+    }
+
+    /* ════════════════════════════════
+       شارة المحاكاة
+    ════════════════════════════════ */
+    #simBadge {
+      position: fixed; bottom: 14px; left: 16px;
+      background: #FF6B35; color: #fff;
+      padding: 5px 13px; border-radius: 50px;
+      font-size: 0.73rem; font-weight: 700;
+      z-index: 100; display: none;
+    }
+    #simBadge.show { display: block; }
+
+    /* لوحة إدخال المحاكاة */
+    #simInputBar {
+      position: fixed; bottom: 12px; left: 50%; transform: translateX(50%);
+      background: var(--navy); border-radius: 50px;
+      padding: 6px 8px 6px 14px;
+      display: none; align-items: center; gap: 8px;
+      z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      min-width: 340px;
+    }
+    #simInputBar.show { display: flex; }
+    #simInputBar input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: #fff; font-family: 'Tajawal', sans-serif; font-size: 0.85rem;
+      direction: rtl;
+    }
+    #simInputBar input::placeholder { color: rgba(255,255,255,0.45); }
+    #simInputBar button {
+      background: var(--gold); border: none; border-radius: 50px;
+      color: #fff; padding: 6px 14px;
+      font-family: 'Tajawal', sans-serif; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ════════════════════════════════
+       Toast
+    ════════════════════════════════ */
+    #toast {
+      position: fixed; top: 72px; left: 50%; transform: translateX(-50%) translateY(-10px);
+      background: var(--navy); color: #fff;
+      padding: 8px 20px; border-radius: 50px;
+      font-size: 0.82rem; font-weight: 500;
+      z-index: 180; opacity: 0;
+      transition: opacity 0.25s, transform 0.25s;
+      white-space: nowrap; pointer-events: none;
+    }
+    #toast.show {
+      opacity: 1; transform: translateX(-50%) translateY(0);
+    }
+
+    /* ════════════════════════════════
+       انيميشن
+    ════════════════════════════════ */
+    @keyframes pulse-g {
+      0%,100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.5); }
+      50%      { box-shadow: 0 0 0 5px rgba(76,175,80,0); }
+    }
+    @keyframes pulse-d {
+      0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.5); }
+      50%      { box-shadow: 0 0 0 5px rgba(201,168,76,0); }
+    }
+    @keyframes pulse-b {
+      0%,100% { box-shadow: 0 0 0 0 rgba(66,165,245,0.6); }
+      50%      { box-shadow: 0 0 0 5px rgba(66,165,245,0); }
+    }
+    @keyframes card-leave {
+      0%   { transform: scale(1.025); opacity: 1; }
+      100% { transform: scale(0.96);  opacity: 0.3; }
+    }
+    @keyframes card-enter {
+      0%   { transform: scale(0.9);   opacity: 0.3; }
+      100% { transform: scale(1.025); opacity: 1; }
+    }
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-8px); }
+    }
+    @keyframes fadeup {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ════════════════════════════════
+       Scrollbar خفيف
+    ════════════════════════════════ */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     شاشة البداية
+══════════════════════════════════════════ -->
+<div id="startScreen">
+  <div class="start-emblem">🏢</div>
+  <div class="start-title">منظومة الوكلاء الذكية</div>
+  <div class="start-divider"></div>
+  <div class="start-subtitle">
+    القصواء للتطوير العقاري<br>
+    تسعة وكلاء متخصصون، خبرة واحدة متكاملة
+  </div>
+  <button class="start-btn" onclick="startPresentation()">ابدأ التعريف</button>
+  <div class="sim-toggle-wrap">
+    <button class="sim-toggle-btn" id="simToggleBtn" onclick="toggleSimMode()">
+      ⚙️ وضع المحاكاة: <span id="simLabel">إيقاف</span>
+    </button>
+  </div>
+</div>
+
+<!-- لافتة الخطأ -->
+<div id="errorBanner">
+  <span>⚠️ انقطع الاتصال بالخادم</span>
+  <button onclick="retryConnection()">إعادة المحاولة</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     رأس الصفحة
+══════════════════════════════════════════ -->
+<header id="appHeader">
+  <div class="brand">
+    <div class="brand-logo">ق</div>
+    <div>
+      <div class="brand-name">منظومة الوكلاء الذكية</div>
+      <div class="brand-sub">القصواء للتطوير العقاري</div>
+    </div>
+  </div>
+  <div class="status-capsule">
+    <div id="activeAgentName">—</div>
+    <div class="status-pill">
+      <div class="s-dot idle" id="sDot"></div>
+      <span id="sLabel">صامت</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════
+     المحتوى الرئيسي
+══════════════════════════════════════════ -->
+<main id="appMain">
+
+  <!-- شبكة الوكلاء -->
+  <div id="agentsGrid"><!-- تُحقن بواسطة JavaScript --></div>
+
+  <!-- شريط التحكم -->
+  <div id="controlsBar">
+    <button class="btn-mic" id="micBtn" onclick="toggleMic()" title="كتم / تشغيل صوت الوكيل">🎤</button>
+    <button class="btn btn-navy" id="returnBtn" onclick="returnToFahim()" disabled>↩ العودة لفهيم</button>
+    <button class="btn btn-danger" id="endBtn" onclick="endConversation()" disabled>✕ إنهاء الحوار</button>
+  </div>
+
+  <!-- لوحة الـ Transcript -->
+  <div id="transcriptPanel"></div>
+
+</main>
+
+<!-- ══════════════════════════════════════════
+     طبقة التحويل
+══════════════════════════════════════════ -->
+<div id="transferOverlay">
+  <div class="transfer-box">
+    <div class="transfer-icon-wrap">⚡</div>
+    <div class="transfer-title" id="transferTitle">جاري التحويل...</div>
+    <div class="transfer-sub"   id="transferSub"></div>
+  </div>
+</div>
+
+<!-- شارة المحاكاة -->
+<div id="simBadge">🎭 وضع المحاكاة</div>
+
+<!-- إدخال المحاكاة -->
+<div id="simInputBar">
+  <input type="text" id="simInput" placeholder="اكتب رسالة مستخدم وهمية..." onkeydown="simInputKeydown(event)">
+  <button onclick="sendSimInput()">إرسال</button>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     ElevenLabs SDK
+     ملاحظة: إن لم يعمل هذا الرابط، تحقق من:
+     https://docs.elevenlabs.io/conversational-ai/docs/introduction
+     للحصول على رابط CDN المحدّث
+══════════════════════════════════════════ -->
+<script src="https://unpkg.com/@11labs/client@latest/dist/index.umd.js"
+        onload="onSDKLoad()"
+        onerror="onSDKError()">
+</script>
+
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════════════════
+   ⚙️  قسم الإعدادات — عدّل هذه القيم قبل العرض
+   ════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Agent IDs من ElevenLabs
+ * المسار: app.elevenlabs.io → Conversational AI → Agents → Agent ID
+ * استبدل كل قيمة تبدأ بـ AGENT_ID_ بالمعرّف الفعلي من ElevenLabs
+ */
+const AGENT_IDS = {
+  fahim:      'AGENT_ID_FAHIM',         // فهيم — المنسّق الرئيسي
+  network:    'AGENT_ID_NETWORK',       // مسؤول الشبكات
+  systems:    'AGENT_ID_SYSTEMS',       // مسؤول الأنظمة
+  apps:       'AGENT_ID_APPS',          // مسؤولة التطبيقات
+  bim:        'AGENT_ID_BIM',           // مسؤول الـ BIM
+  trainer:    'AGENT_ID_TRAINER',       // المدرّبة التقنية
+  robotics:   'AGENT_ID_ROBOTICS',      // وكيل الروبوتات الإنشائية
+  smarthomes: 'AGENT_ID_SMARTHOMES',    // وكيلة البيوت الذكية
+  reception:  'AGENT_ID_RECEPTION',    // أبو راشد — الاستقبال
+};
+
+/**
+ * كلمات مفتاحية للكشف عن التحويل
+ * المفتاح  = ما قد يقوله الوكيل في ردّه (تحقق من System Prompts وكلائك)
+ * القيمة   = مفتاح الوكيل في AGENT_IDS أعلاه
+ * قابل للتعديل — أضف أو احذف حسب صياغة وكلائك
+ */
+const TRANSFER_KEYWORDS = {
+  'فهيم':                      'fahim',
+  'المنسق':                    'fahim',
+  'المنسّق':                   'fahim',
+  'مسؤول الشبكات':             'network',
+  'مسؤولة الشبكات':            'network',
+  'قسم الشبكات':               'network',
+  'إدارة الشبكات':             'network',
+  'مسؤول الأنظمة':             'systems',
+  'مسؤولة الأنظمة':            'systems',
+  'قسم الأنظمة':               'systems',
+  'مسؤولة التطبيقات':          'apps',
+  'مسؤول التطبيقات':           'apps',
+  'قسم التطبيقات':             'apps',
+  'مسؤول الـ BIM':             'bim',
+  'مسؤول البيم':               'bim',
+  'مسؤول bim':                 'bim',
+  'قسم البيم':                  'bim',
+  'المدرّبة التقنية':           'trainer',
+  'المدربة التقنية':            'trainer',
+  'قسم التدريب':               'trainer',
+  'وكيل الروبوتات':            'robotics',
+  'وكيلة الروبوتات':           'robotics',
+  'الروبوتات الإنشائية':       'robotics',
+  'وكيلة البيوت الذكية':       'smarthomes',
+  'وكيل البيوت الذكية':        'smarthomes',
+  'البيوت الذكية':             'smarthomes',
+  'أبو راشد':                  'reception',
+  'ابو راشد':                  'reception',
+  'الاستقبال':                 'reception',
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   📋  بيانات عرض الوكلاء (لا تحتاج تعديلاً إلا للأسماء/الأوصاف)
+   ════════════════════════════════════════════════════════════════════════ */
+const AGENTS_META = {
+  fahim:      { name:'فهيم',                     role:'المنسّق الرئيسي',           icon:'🧠', desc:'يستقبل أسئلتك ويحوّلك للمتخصص المناسب' },
+  network:    { name:'مسؤول الشبكات',            role:'Network Engineer',           icon:'🌐', desc:'شبكات، VPN، Wi-Fi، جدران نارية' },
+  systems:    { name:'مسؤول الأنظمة',            role:'Systems Administrator',      icon:'🖥️', desc:'سيرفرات، أنظمة تشغيل، نسخ احتياطي' },
+  apps:       { name:'مسؤولة التطبيقات',         role:'Application Manager',        icon:'💼', desc:'ERP، CRM، قواعد بيانات، تكاملات' },
+  bim:        { name:'مسؤول الـ BIM',             role:'BIM Manager',                icon:'🏗️', desc:'نمذجة المباني، Revit، BIM 360' },
+  trainer:    { name:'المدرّبة التقنية',          role:'Tech Trainer',               icon:'📚', desc:'تدريب الموظفين، المناهج التقنية' },
+  robotics:   { name:'وكيل الروبوتات الإنشائية', role:'Construction Robotics',      icon:'🚁', desc:'طائرات مسيّرة، ماسحات ليزرية، AI' },
+  smarthomes: { name:'وكيلة البيوت الذكية',      role:'Smart Homes Engineer',       icon:'🏠', desc:'IoT، KNX، Matter، أتمتة الوحدات' },
+  reception:  { name:'أبو راشد',                 role:'موظف الاستقبال',             icon:'👋', desc:'الترحيب، التوجيه العام، الاستفسارات' },
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   🎭  سكريبتات المحاكاة (عدّلها لتناسب عرضك التجريبي)
+   ════════════════════════════════════════════════════════════════════════ */
+const SIM_SCRIPTS = {
+  fahim: [
+    { delay:1400, text:'أهلاً وسهلاً بكم في منظومة وكلاء الذكاء الاصطناعي لشركة القصواء. أنا فهيم، المنسّق الرئيسي. يسعدني استقبال أسئلتكم.' },
+    { delay:5000, text:'يمكنني مساعدتكم في أي استفسار تقني. هل لديكم سؤال عن الشبكات أو الأنظمة أو التطبيقات؟' },
+    { delay:8000, text:'بالنسبة للسؤال عن الشبكات، هذا تخصص مسؤول الشبكات. اسمح لي أحوّلك له ليجيبك بشكل أدق وأشمل.' },
+  ],
+  network: [
+    { delay:1200, text:'أهلاً! وصلني سؤالك. أنا مسؤول الشبكات في القصواء. بنيتنا التحتية تعتمد SD-WAN مع نسخ احتياطي LTE في جميع المواقع.' },
+    { delay:6000, text:'يمكنني تفصيل أي جانب من جوانب الشبكة. هل تريد معلومات عن الأمن أو الأداء أو التوصيلية؟' },
+  ],
+  systems: [
+    { delay:1200, text:'مرحباً! أنا مسؤول الأنظمة. لدينا بنية هجينة: سيرفرات فيزيائية في المقر مع بيئة سحابية على Azure.' },
+  ],
+  apps: [
+    { delay:1200, text:'أهلاً! أنا مسؤولة التطبيقات. نُشغّل حزمة ERP متكاملة مع CRM مخصّص لإدارة العقارات والعملاء.' },
+  ],
+  bim: [
+    { delay:1200, text:'مرحباً! أنا مسؤول الـ BIM. نعمل على Revit مع BIM 360 لإدارة نماذج المشاريع التعاونية عبر الفرق المختلفة.' },
+  ],
+  trainer: [
+    { delay:1200, text:'أهلاً بكم! أنا المدرّبة التقنية. نقدّم برامج تدريب مُصمَّمة لكل قسم وفق مستوى كل موظف.' },
+  ],
+  robotics: [
+    { delay:1200, text:'مساء الخير! أنا وكيل الروبوتات الإنشائية. نستخدم طائرات مسيّرة للمراقبة اليومية للمواقع ومقارنتها بنماذج BIM.' },
+  ],
+  smarthomes: [
+    { delay:1200, text:'أهلاً! أنا وكيلة البيوت الذكية. ننفّذ منظومة Matter/KNX متكاملة تُدار عبر تطبيق موحّد للمقيمين.' },
+  ],
+  reception: [
+    { delay:1200, text:'أهلاً وسهلاً! أنا أبو راشد من الاستقبال. حياك الله. أي استفسار أقدر أوجّهك فيه؟' },
+  ],
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   🔧  حالة التطبيق (لا تعدّل)
+   ════════════════════════════════════════════════════════════════════════ */
+let simulationMode  = false;
+let activeAgentKey  = null;
+let conversation    = null;
+let isMuted         = false;
+let isTransferring  = false;
+let sessionStarted  = false;
+let transcript      = [];
+let lastUserMsg     = '';
+let simStepTimers   = [];
+let ConvAPI         = null;   // مرجع لـ Conversation class بعد تحميل SDK
+
+/* ════════════════════════════════════════════════════════════════════════
+   🏗️  بناء شبكة بطاقات الوكلاء
+   ════════════════════════════════════════════════════════════════════════ */
+const AGENT_ORDER = ['fahim','network','systems','apps','bim','trainer','robotics','smarthomes','reception'];
+
+function buildGrid() {
+  const grid = document.getElementById('agentsGrid');
+  grid.innerHTML = AGENT_ORDER.map(key => {
+    const m = AGENTS_META[key];
+    return `
+      <div class="agent-card" id="card-${key}" onclick="onCardClick('${key}')">
+        <div class="card-badge" id="badge-${key}"></div>
+        <div class="card-icon">${m.icon}</div>
+        <div class="card-name">${m.name}</div>
+        <div class="card-role">${m.role}</div>
+        <div class="card-desc">${m.desc}</div>
+      </div>`;
+  }).join('');
+  console.log('[Grid] ✅ شبكة الوكلاء جاهزة');
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   🎨  إدارة الحالة البصرية للبطاقات
+   ════════════════════════════════════════════════════════════════════════ */
+function setActiveCard(key, withAnimation = false) {
+  console.log(`[UI] تعيين الوكيل النشط: ${key}`);
+  const prevKey = activeAgentKey;
+
+  AGENT_ORDER.forEach(k => {
+    const card = document.getElementById(`card-${k}`);
+    card.classList.remove('active','available','leaving','entering');
+    if (!key) return; // إعادة ضبط كاملة
+
+    if (k === key) {
+      if (withAnimation) {
+        card.classList.add('entering');
+        card.addEventListener('animationend', () => {
+          card.classList.remove('entering');
+          card.classList.add('active');
+        }, { once: true });
+      } else {
+        card.classList.add('active');
+      }
+    } else {
+      if (withAnimation && k === prevKey) {
+        card.classList.add('leaving');
+        card.addEventListener('animationend', () => {
+          card.classList.remove('leaving');
+          card.classList.add('available');
+        }, { once: true });
+      } else {
+        card.classList.add('available');
+      }
+    }
+  });
+
+  activeAgentKey = key;
+  document.getElementById('activeAgentName').textContent = key ? AGENTS_META[key].name : '—';
+}
+
+function clearAllCards() {
+  AGENT_ORDER.forEach(k => {
+    document.getElementById(`card-${k}`)
+      .classList.remove('active','available','leaving','entering');
+  });
+  activeAgentKey = null;
+  document.getElementById('activeAgentName').textContent = '—';
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   🚦  شريط الحالة
+   ════════════════════════════════════════════════════════════════════════ */
+const STATUS_LABELS = {
+  idle: 'صامت', listening: 'يستمع', speaking: 'يتكلّم', transferring: 'جاري التحويل'
+};
+function setStatus(s) {
+  const dot = document.getElementById('sDot');
+  dot.className = `s-dot ${s}`;
+  document.getElementById('sLabel').textContent = STATUS_LABELS[s] || s;
+  console.log(`[Status] → ${s}`);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   📝  إضافة سطر للـ Transcript
+   ════════════════════════════════════════════════════════════════════════ */
+function addTranscript(role, text, agentKey = null) {
+  transcript.push({ role, text, agentKey, ts: Date.now() });
+  const names = {
+    user:   'أنت',
+    agent:  agentKey ? AGENTS_META[agentKey]?.name : 'الوكيل',
+    system: 'النظام',
+  };
+  const panel = document.getElementById('transcriptPanel');
+  const row = document.createElement('div');
+  row.className = 'tr-row';
+  row.innerHTML = `
+    <span class="tr-who ${role}">${names[role] || role}:</span>
+    <span class="tr-text ${role === 'system' ? 'system' : ''}">${escHtml(text)}</span>`;
+  panel.appendChild(row);
+  panel.scrollTop = panel.scrollHeight;
+  if (role === 'user') lastUserMsg = text;
+  console.log(`[Transcript] ${role}: ${text}`);
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   🔍  كشف نية التحويل من نص الوكيل
+   ════════════════════════════════════════════════════════════════════════ */
+const TRANSFER_PHRASES = [
+  /اسمح لي أحوّلك ل([؀-ۿ\s]+?)(?:[.،\n]|$)/,
+  /اسمح لي احولك ل([؀-ۿ\s]+?)(?:[.،\n]|$)/,
+  /سأحوّلك (?:إلى|ل)([؀-ۿ\s]+?)(?:[.،\n]|$)/,
+  /سأحولك (?:إلى|ل)([؀-ۿ\s]+?)(?:[.،\n]|$)/,
+  /هذا تخصص ([؀-ۿ\s]+?)(?:[.،\n]|$)/,
+  /أحوّلك (?:الآن |الان )?(?:إلى|ل)([؀-ۿ\s]+?)(?:[.،\n]|$)/,
+  /أنصح(?:ك)? بالتحدث (?:مع|إلى|ل)([؀-ۿ\s]+?)(?:[.،\n]|$)/,
+];
+const TRANSFER_INDICATORS = ['أحوّلك','احولك','تحويل','تخصص','يتخصص','أنصح','أفضّل','تواصل مع'];
+
+function detectTransfer(text) {
+  if (isTransferring) return null;
+
+  // البحث بالأنماط المنظّمة
+  for (const rx of TRANSFER_PHRASES) {
+    const m = text.match(rx);
+    if (m) {
+      const mention = m[1].trim();
+      console.log(`[Detect] عبارة تحويل: "${mention}"`);
+      for (const [kw, target] of Object.entries(TRANSFER_KEYWORDS)) {
+        if (mention.includes(kw) || kw.includes(mention.substring(0, 6))) {
+          if (target !== activeAgentKey) {
+            console.log(`[Detect] ✅ تطابق → ${target}`);
+            return target;
+          }
+        }
+      }
+    }
+  }
+
+  // بحث احتياطي: اسم وكيل + مؤشر تحويل في النص
+  for (const [kw, target] of Object.entries(TRANSFER_KEYWORDS)) {
+    if (target !== activeAgentKey && text.includes(kw)) {
+      if (TRANSFER_INDICATORS.some(ind => text.includes(ind))) {
+        console.log(`[Detect] ✅ بحث احتياطي: "${kw}" → ${target}`);
+        return target;
+      }
+    }
+  }
+
+  return null;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   🔄  تنفيذ التحويل بين الوكلاء
+   ════════════════════════════════════════════════════════════════════════ */
+async function executeTransfer(targetKey) {
+  if (isTransferring || targetKey === activeAgentKey) return;
+  isTransferring = true;
+  const srcKey = activeAgentKey;
+  const meta   = AGENTS_META[targetKey];
+
+  console.log(`[Transfer] ⚡ ${srcKey} → ${targetKey}`);
+  setStatus('transferring');
+
+  // عرض Overlay
+  document.getElementById('transferTitle').textContent = `جاري التحويل إلى ${meta.name}`;
+  document.getElementById('transferSub').textContent   = meta.role;
+  document.getElementById('transferOverlay').classList.add('show');
+
+  addTranscript('system', `⚡ التحويل إلى ${meta.name}...`);
+
+  // إنهاء الجلسة الحالية
+  await sleep(700);
+  await endCurrentSession(true);
+
+  // تحديث البطاقات
+  setActiveCard(targetKey, true);
+  await sleep(500);
+
+  // إخفاء Overlay
+  document.getElementById('transferOverlay').classList.remove('show');
+  isTransferring = false;
+
+  // بناء رسالة السياق للوكيل الجديد
+  const ctxMsg = lastUserMsg
+    ? `وصلني سؤالك عن "${lastUserMsg}"، اسمح لي أجيبك.`
+    : `تم التحويل إليّ من زميلي. كيف أقدر أساعدك؟`;
+
+  await startSession(targetKey, ctxMsg);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   🚀  بدء جلسة وكيل جديد
+   ════════════════════════════════════════════════════════════════════════ */
+async function startSession(agentKey, firstMsgOverride = null) {
+  console.log(`[Session] بدء جلسة: ${agentKey}`, firstMsgOverride ? `| firstMsg: "${firstMsgOverride}"` : '');
+
+  if (simulationMode) {
+    startSimulation(agentKey, firstMsgOverride);
+    return;
+  }
+
+  // التحقق من Agent ID
+  const agentId = AGENT_IDS[agentKey];
+  if (!agentId || agentId.startsWith('AGENT_ID_')) {
+    console.error(`[Session] ❌ Agent ID غير مُعيَّن للوكيل "${agentKey}". عدّل AGENT_IDS في أعلى الكود.`);
+    showToast(`⚠️ Agent ID مفقود: ${AGENTS_META[agentKey].name}`);
+    setStatus('idle');
+    return;
+  }
+
+  // التحقق من SDK
+  if (!ConvAPI) {
+    console.error('[Session] ❌ ElevenLabs SDK غير محمّل. تحقق من رابط CDN.');
+    showError('SDK غير محمّل — تحقق من الاتصال بالإنترنت');
+    return;
+  }
+
+  try {
+    const opts = {
+      agentId,
+      onConnect: () => {
+        console.log(`[Session] ✅ اتصل: ${agentKey}`);
+        setStatus('listening');
+        hideError();
+      },
+      onDisconnect: () => {
+        console.log(`[Session] 🔌 انقطع: ${agentKey}`);
+        if (!isTransferring) { setStatus('idle'); showError(); }
+      },
+      onError: (msg, ctx) => {
+        console.error(`[Session] ❌ خطأ ${agentKey}:`, msg, ctx);
+        if (!isTransferring) showError();
+      },
+      onMessage: ({ message, source }) => {
+        // source = 'ai' | 'user'
+        if (source === 'ai') {
+          console.log(`[Message] AI: ${message}`);
+          addTranscript('agent', message, agentKey);
+          const target = detectTransfer(message);
+          if (target) {
+            // انتظر نهاية الجملة قبل التحويل
+            setTimeout(() => executeTransfer(target), 1800);
+          }
+        } else if (source === 'user') {
+          console.log(`[Message] User: ${message}`);
+          addTranscript('user', message);
+        }
+      },
+      onStatusChange: ({ status }) => {
+        console.log(`[StatusChange] ${status}`);
+        if (status === 'connected') setStatus('listening');
+      },
+      onModeChange: ({ mode }) => {
+        console.log(`[ModeChange] ${mode}`);
+        setStatus(mode === 'speaking' ? 'speaking' : 'listening');
+      },
+    };
+
+    if (firstMsgOverride) {
+      opts.overrides = { agent: { firstMessage: firstMsgOverride } };
+    }
+
+    conversation = await ConvAPI.startSession(opts);
+    console.log(`[Session] 🎤 جلسة نشطة: ${agentKey}`);
+
+    // تطبيق حالة الكتم إن كانت مفعّلة
+    if (isMuted && conversation.setVolume) {
+      conversation.setVolume({ volume: 0 });
+    }
+
+  } catch (err) {
+    console.error('[Session] ❌ فشل startSession:', err);
+    showError();
+  }
+}
+
+async function endCurrentSession(silent = false) {
+  clearSimTimers();
+  if (conversation) {
+    try {
+      await conversation.endSession();
+      console.log(`[Session] 🔴 إنهاء جلسة: ${activeAgentKey}`);
+    } catch (e) {
+      console.warn('[Session] تحذير عند الإنهاء:', e);
+    }
+    conversation = null;
+  }
+  if (!silent) setStatus('idle');
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   🎭  وضع المحاكاة
+   ════════════════════════════════════════════════════════════════════════ */
+function startSimulation(agentKey, firstMsgOverride = null) {
+  console.log(`[Sim] بدء محاكاة: ${agentKey}`);
+  clearSimTimers();
+  setStatus('listening');
+
+  const base  = SIM_SCRIPTS[agentKey] || [];
+  const msgs  = firstMsgOverride
+    ? [{ delay: 1100, text: firstMsgOverride }, ...base.slice(1)]
+    : base;
+
+  msgs.forEach((msg, i) => {
+    const t = setTimeout(() => {
+      setStatus('speaking');
+      addTranscript('agent', msg.text, agentKey);
+      const target = detectTransfer(msg.text);
+      if (target) {
+        setTimeout(() => executeTransfer(target), 2200);
+      } else {
+        setTimeout(() => setStatus('listening'), 1800);
+      }
+    }, msg.delay);
+    simStepTimers.push(t);
+  });
+}
+
+function clearSimTimers() {
+  simStepTimers.forEach(t => clearTimeout(t));
+  simStepTimers = [];
+}
+
+/* وظائف إدخال المحاكاة */
+function simInputKeydown(e) { if (e.key === 'Enter') sendSimInput(); }
+function sendSimInput() {
+  const inp = document.getElementById('simInput');
+  const txt = inp.value.trim();
+  if (!txt || !simulationMode || !activeAgentKey) return;
+  addTranscript('user', txt);
+  inp.value = '';
+  console.log(`[Sim] مدخل مستخدم: ${txt}`);
+  // رد وهمي بعد ثانية
+  setTimeout(() => {
+    const responses = {
+      fahim:      'شكراً على سؤالك. إن كان يخص الشبكات، اسمح لي أحوّلك لمسؤول الشبكات.',
+      network:    'سؤال ممتاز. بنيتنا تعتمد تقنيات حديثة لضمان الاتصال المستمر.',
+      systems:    'نعم، لدينا نظام احتياطي كامل لحماية البيانات.',
+      apps:       'التطبيقات متكاملة ومربوطة مع جميع الأقسام.',
+      bim:        'النماذج ثلاثية الأبعاد محدّثة يومياً من الموقع.',
+      trainer:    'يمكنني تصميم برنامج تدريبي مناسب لاحتياجاتكم.',
+      robotics:   'الطائرات المسيّرة تُغطّي الموقع بالكامل يومياً.',
+      smarthomes: 'كل وحدة مزوّدة بتحكم ذكي متكامل.',
+      reception:  'بكل سرور، يمكنني توجيهك للقسم المناسب.',
+    };
+    setStatus('speaking');
+    addTranscript('agent', responses[activeAgentKey] || 'يسعدني مساعدتك.', activeAgentKey);
+    setTimeout(() => setStatus('listening'), 1800);
+  }, 1200);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   🎮  أزرار التحكم الرئيسية
+   ════════════════════════════════════════════════════════════════════════ */
+async function startPresentation() {
+  console.log('[App] ═══ بدء العرض التقديمي ═══');
+  const screen = document.getElementById('startScreen');
+  screen.classList.add('fade-out');
+  setTimeout(() => screen.classList.add('hidden'), 500);
+
+  sessionStarted = true;
+  document.getElementById('returnBtn').disabled = false;
+  document.getElementById('endBtn').disabled    = false;
+
+  if (simulationMode) {
+    document.getElementById('simBadge').classList.add('show');
+    document.getElementById('simInputBar').classList.add('show');
+    showToast('🎭 وضع المحاكاة — لا يوجد اتصال فعلي بـ ElevenLabs');
+    console.log('[Sim] ✅ وضع المحاكاة نشط');
+  }
+
+  setActiveCard('fahim');
+  await startSession('fahim');
+}
+
+async function returnToFahim() {
+  if (!sessionStarted || activeAgentKey === 'fahim' || isTransferring) return;
+  console.log('[App] العودة لفهيم');
+  addTranscript('system', 'العودة إلى فهيم...');
+  await executeTransfer('fahim');
+}
+
+async function endConversation() {
+  if (!sessionStarted) return;
+  console.log('[App] ═══ إنهاء الحوار ═══');
+  await endCurrentSession();
+  clearAllCards();
+  setStatus('idle');
+  document.getElementById('returnBtn').disabled = true;
+  document.getElementById('endBtn').disabled    = true;
+  sessionStarted = false;
+  lastUserMsg    = '';
+  addTranscript('system', '— تم إنهاء الحوار —');
+  showToast('تم إنهاء الحوار');
+}
+
+function toggleMic() {
+  isMuted = !isMuted;
+  const btn = document.getElementById('micBtn');
+  if (isMuted) {
+    btn.textContent = '🔇';
+    btn.classList.add('muted');
+    btn.classList.remove('live');
+    if (conversation?.setVolume) conversation.setVolume({ volume: 0 });
+    showToast('🔇 صوت الوكيل مكتوم');
+    console.log('[Mic] مكتوم');
+  } else {
+    btn.textContent = '🎤';
+    btn.classList.remove('muted');
+    btn.classList.add('live');
+    if (conversation?.setVolume) conversation.setVolume({ volume: 1 });
+    showToast('🎤 صوت الوكيل مفعّل');
+    console.log('[Mic] مفعّل');
+  }
+}
+
+function onCardClick(key) {
+  if (!sessionStarted || isTransferring || key === activeAgentKey) return;
+  const msg = `هل تريد التحويل مباشرة إلى "${AGENTS_META[key].name}"؟`;
+  if (window.confirm(msg)) {
+    console.log(`[Card] تحويل يدوي → ${key}`);
+    executeTransfer(key);
+  }
+}
+
+function toggleSimMode() {
+  simulationMode = !simulationMode;
+  const lbl = document.getElementById('simLabel');
+  const btn  = document.getElementById('simToggleBtn');
+  lbl.textContent = simulationMode ? 'تشغيل' : 'إيقاف';
+  btn.classList.toggle('on', simulationMode);
+  console.log(`[Sim] وضع المحاكاة: ${simulationMode ? 'مفعّل' : 'معطّل'}`);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   🔌  معالجة الأخطاء والاتصال
+   ════════════════════════════════════════════════════════════════════════ */
+function showError(msg = null) {
+  const b = document.getElementById('errorBanner');
+  if (msg) b.querySelector('span').textContent = `⚠️ ${msg}`;
+  b.classList.add('show');
+}
+function hideError() {
+  document.getElementById('errorBanner').classList.remove('show');
+}
+async function retryConnection() {
+  if (!sessionStarted || !activeAgentKey) return;
+  hideError();
+  showToast('جاري إعادة الاتصال...');
+  console.log('[Retry] إعادة الاتصال...');
+  await startSession(activeAgentKey);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   🔔  Toast إشعار مؤقت
+   ════════════════════════════════════════════════════════════════════════ */
+let _toastTimer = null;
+function showToast(msg, ms = 3200) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   📦  تحميل SDK
+   ════════════════════════════════════════════════════════════════════════ */
+function onSDKLoad() {
+  // محاولة إيجاد Conversation class بأسماء مختلفة محتملة
+  if (window.ElevenLabs?.Conversation) {
+    ConvAPI = window.ElevenLabs.Conversation;
+    console.log('[SDK] ✅ محمّل عبر ElevenLabs.Conversation');
+  } else if (window.ElevenLabsClient?.Conversation) {
+    ConvAPI = window.ElevenLabsClient.Conversation;
+    console.log('[SDK] ✅ محمّل عبر ElevenLabsClient.Conversation');
+  } else {
+    // بحث تلقائي في النافذة
+    const found = Object.entries(window).find(([, v]) =>
+      v && typeof v === 'object' && typeof v.startSession === 'function'
+    );
+    if (found) {
+      ConvAPI = found[1];
+      console.log(`[SDK] ✅ محمّل عبر window.${found[0]}`);
+    } else {
+      console.error('[SDK] ❌ لم يُعثر على Conversation API. المتغيرات المتاحة تبدأ بـ eleven:',
+        Object.keys(window).filter(k => k.toLowerCase().includes('eleven')));
+    }
+  }
+}
+
+function onSDKError() {
+  console.error('[SDK] ❌ فشل تحميل @11labs/client من CDN. تحقق من الاتصال أو غيّر رابط CDN.');
+  // الكود يعمل في وضع المحاكاة حتى لو فشل SDK
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   🛠️  مساعدات
+   ════════════════════════════════════════════════════════════════════════ */
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   🏁  تهيئة عند تحميل الصفحة
+   ════════════════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  buildGrid();
+  console.log('[App] ✅ الصفحة جاهزة');
+  console.log('[App] وكلاء مُعرَّفون:', Object.keys(AGENT_IDS).join(', '));
+  console.log('[App] لبدء المحاكاة: فعّل "وضع المحاكاة" من شاشة البداية');
+  console.log('[App] للربط الفعلي: ضع Agent IDs في كائن AGENT_IDS أعلى الكود');
+});
+</script>
+</body>
+</html>
