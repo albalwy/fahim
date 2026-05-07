@@ -216,42 +216,100 @@
   <script src="https://unpkg.com/@11labs/client@latest/dist/index.umd.js"
           onload="onSDKLoad()" onerror="onSDKError()"></script>
 
-<!-- ═══════════════════ نهاية الجزء 1 — اطلب الجزء 2 لإكمال الـ <script> الرئيسي و</body></html> ═══════════════════ -->
   <script>
 'use strict';
 
-/* ═══════════════════ معرّفات الوكلاء على ElevenLabs ═══════════════════ */
+/* ════════════════════════════════════════════════════════════════════════
+   ⚙️  Agent IDs — ضع معرّف كل وكيل هنا بعد إنشائه على ElevenLabs
+   ════════════════════════════════════════════════════════════════════════
+   القيمة الفارغة '' تعني: وضع محاكاة لهذا الوكيل تلقائياً
+*/
 const AGENT_IDS = {
-  fahim:      'agent_fahim_placeholder',
-  network:    'agent_network_placeholder',
-  systems:    'agent_systems_placeholder',
-  apps:       'agent_apps_placeholder',
-  bim:        'agent_bim_placeholder',
-  trainer:    'agent_trainer_placeholder',
-  robotics:   'agent_robotics_placeholder',
-  smarthomes: 'agent_smarthomes_placeholder',
-  reception:  'agent_reception_placeholder'
+  fahim:      'agent_6801kqyjagngebwvg4ypwadp9y0q',  // ✅ متصل
+  network:    'agent_6701kqymma5zfw1ac38ey6jm32xs',  // ✅ متصل
+  systems:    '',   // 🎭 محاكاة — أضف ID عند الجاهزية
+  apps:       '',   // 🎭 محاكاة
+  bim:        '',   // 🎭 محاكاة
+  trainer:    '',   // 🎭 محاكاة
+  robotics:   '',   // 🎭 محاكاة
+  smarthomes: '',   // 🎭 محاكاة
+  reception:  '',   // 🎭 محاكاة
 };
 
-/* ═══════════════════ كلمات مفتاحية للتحويل (C2 fix: تقليل سكربت فهيم) ═══════════════════ */
+/* ════════════════════════════════════════════════════════════════════════
+   🔍  أنماط اكتشاف نية التحويل من ردّ الوكيل (قابلة للتوسيع)
+   ════════════════════════════════════════════════════════════════════════ */
+const TRANSFER_PHRASES = [
+  /اسمح لي أحوّل(?:ك|كم) ل([؀-ۿa-zA-Z][؀-ۿa-zA-Z\s]*?)(?:[.،\n!؟]|$)/,
+  /اسمح لي احول(?:ك|كم) ل([؀-ۿa-zA-Z][؀-ۿa-zA-Z\s]*?)(?:[.،\n!؟]|$)/,
+  /سأحوّل(?:ك|كم) (?:إلى|الى|ل) ?([؀-ۿa-zA-Z][؀-ۿa-zA-Z\s]*?)(?:[.،\n!؟]|$)/,
+  /ساحول(?:ك|كم) (?:إلى|الى|ل) ?([؀-ۿa-zA-Z][؀-ۿa-zA-Z\s]*?)(?:[.،\n!؟]|$)/,
+  /أحوّل(?:ك|كم) (?:الآن |الان )?(?:إلى|الى|ل) ?([؀-ۿa-zA-Z][؀-ۿa-zA-Z\s]*?)(?:[.،\n!؟]|$)/,
+  /احول(?:ك|كم) (?:الآن |الان )?(?:إلى|الى|ل) ?([؀-ۿa-zA-Z][؀-ۿa-zA-Z\s]*?)(?:[.،\n!؟]|$)/,
+  /هذا تخصص ([؀-ۿa-zA-Z][؀-ۿa-zA-Z\s]*?)(?:[.،\n!؟]|$)/,
+  /أنصح(?:ك|كم)? بالتحدث (?:مع|إلى|ل) ?([؀-ۿa-zA-Z][؀-ۿa-zA-Z\s]*?)(?:[.،\n!؟]|$)/,
+];
+
+/* مؤشرات تحويل للبحث الاحتياطي */
+const TRANSFER_INDICATORS = [
+  'أحوّلك','أحوّلكم','احولك','احولكم',
+  'سأحوّل','ساحول','تحويل','يتخصص',
+  'تخصص','أنصح','أفضّل',
+  'خارج اختصاصي','خارج نطاقي',
+];
+
+/* خريطة: اسم الوكيل كما يذكره الوكيل ← مفتاح AGENT_IDS */
 const TRANSFER_KEYWORDS = {
-  network:    ['شبكة','شبكات','واي فاي','wifi','wi-fi','إنترنت','انترنت','راوتر','router','vlan','اتصال','نت','كيبل','كابل','switch','سويتش','firewall','جدار حماية','vpn','dns','ip'],
-  systems:    ['نظام','أنظمة','انظمة','خادم','سيرفر','server','windows','linux','ويندوز','لينكس','active directory','ad','نسخ احتياطي','backup','virtualization','hyper-v','vmware','تخزين','storage','raid'],
-  apps:       ['تطبيق','تطبيقات','برنامج','برامج','revit','autocad','اوتوكاد','أوتوكاد','navisworks','تثبيت','installation','license','رخصة','ترخيص','تحديث','update','crash','يعلق','بطء','office','اوفيس'],
-  bim:        ['bim','بيم','نمذجة','lod','clash','ifc','navisworks','revit family','مشروع تنفيذي','as-built','4d','5d','coordination','تنسيق نماذج'],
-  trainer:    ['تدريب','تدريبات','دورة','دورات','تأهيل','مهارات','تعليم','ورشة','ورش','workshop','training','onboarding','الموظفين الجدد'],
-  robotics:   ['روبوت','روبوتات','أتمتة','اتمتة','automation','3d printing','طباعة ثلاثية','طباعة الخرسانة','drone','درون','طائرة','مسح ضوئي','scan','laser scan'],
-  smarthomes: ['بيت ذكي','منزل ذكي','بيوت ذكية','smart home','iot','matter','zigbee','z-wave','homekit','google home','alexa','إضاءة ذكية','مستشعر','sensor','اوتوميشن منزلي'],
-  reception:  ['سنترال','مكالمة','مكالمات','استقبال','تحويل مكالمة','call','phone','هاتف','رد آلي','ivr','pbx','voip','sip','3cx']
+  'فهيم':                  'fahim',
+  'المنسق':                'fahim',
+  'المنسّق':               'fahim',
+  'مسؤول الشبكات':        'network',
+  'مسؤولة الشبكات':       'network',
+  'قسم الشبكات':           'network',
+  'إدارة الشبكات':         'network',
+  'مسؤول الأنظمة':        'systems',
+  'مسؤولة الأنظمة':       'systems',
+  'قسم الأنظمة':           'systems',
+  'مسؤولة التطبيقات':     'apps',
+  'مسؤول التطبيقات':      'apps',
+  'قسم التطبيقات':         'apps',
+  'مسؤول الـ BIM':         'bim',
+  'مسؤول البيم':           'bim',
+  'مسؤول BIM':             'bim',
+  'قسم البيم':              'bim',
+  'المدرّبة التقنية':      'trainer',
+  'المدربة التقنية':       'trainer',
+  'قسم التدريب':           'trainer',
+  'وكيل الروبوتات':        'robotics',
+  'وكيلة الروبوتات':       'robotics',
+  'الروبوتات الإنشائية':   'robotics',
+  'وكيلة البيوت الذكية':   'smarthomes',
+  'وكيل البيوت الذكية':    'smarthomes',
+  'البيوت الذكية':         'smarthomes',
+  'أبو راشد':              'reception',
+  'ابو راشد':              'reception',
+  'الاستقبال':             'reception',
 };
 
-/* ═══════════════════ C1 fix: نوايا المستخدم لاكتشاف نوع السؤال ═══════════════════ */
+/* كلمات مفتاحية لموضوع سؤال المستخدم (للمحاكاة فقط) */
+const TOPIC_KEYWORDS = {
+  network:    ['شبكة','شبكات','واي فاي','wifi','wi-fi','إنترنت','انترنت','راوتر','router','vlan','اتصال','كيبل','switch','firewall','vpn','dns'],
+  systems:    ['نظام','أنظمة','خادم','سيرفر','server','windows','linux','active directory','نسخ احتياطي','backup','vmware','hyper-v','تخزين'],
+  apps:       ['تطبيق','تطبيقات','برنامج','autocad','navisworks','تثبيت','license','رخصة','تحديث','crash','يعلق','office'],
+  bim:        ['bim','بيم','نمذجة','lod','clash','ifc','revit family','as-built','4d','5d'],
+  trainer:    ['تدريب','دورة','تأهيل','مهارات','ورشة','workshop','training','onboarding'],
+  robotics:   ['روبوت','أتمتة','automation','3d printing','طباعة ثلاثية','drone','درون','طائرة','مسح ضوئي','laser scan'],
+  smarthomes: ['بيت ذكي','منزل ذكي','بيوت ذكية','smart home','iot','matter','zigbee','إضاءة ذكية','مستشعر'],
+  reception:  ['سنترال','مكالمة','استقبال','call','phone','هاتف','ivr','pbx','voip','3cx'],
+};
+
+/* ════ نوايا المستخدم لاستخدامها في المحاكاة ════ */
 const USER_INTENT_KEYWORDS = {
   greeting:   ['مرحبا','مرحبًا','اهلا','أهلا','أهلًا','السلام','هلا','هاي','hi','hello'],
   whoAreYou:  ['من انت','من أنت','من حضرتك','تعرف بنفسك','عرف نفسك','عرّف نفسك','مين انت'],
   whatDoYouDo:['ماذا تفعل','وش تسوي','ايش تشتغل','شو شغلك','ما هو دورك','ما دورك','وش دورك','ايش وظيفتك'],
   thanks:     ['شكرا','شكرًا','مشكور','يعطيك العافية','تسلم','thanks','thank you'],
-  bye:        ['وداعا','مع السلامة','الى اللقاء','إلى اللقاء','باي','bye','goodbye']
+  bye:        ['وداعا','مع السلامة','الى اللقاء','إلى اللقاء','باي','bye','goodbye'],
 };
 
 /* ═══════════════════ C1 fix: ردود الوكلاء حسب نوع السؤال ═══════════════════ */
@@ -322,287 +380,496 @@ const AGENT_RESPONSES = {
   }
 };
 
-/* ═══════════════════ بيانات بطاقات الوكلاء ═══════════════════ */
-const AGENTS_META = [
-  { id:'network',    name:'مسؤول الشبكات',          role:'Network Engineer',    icon:'🌐' },
-  { id:'systems',    name:'مسؤول الأنظمة',          role:'Systems Administrator', icon:'🖥️' },
-  { id:'apps',       name:'مسؤولة التطبيقات',       role:'Applications Lead',   icon:'💼' },
-  { id:'fahim',      name:'فهيم — المنسّق',         role:'Coordinator',         icon:'🤝' },
-  { id:'bim',        name:'مسؤول الـ BIM',           role:'BIM Manager',         icon:'🏗️' },
-  { id:'trainer',    name:'المدرّبة التقنية',        role:'Technical Trainer',   icon:'🎓' },
-  { id:'robotics',   name:'وكيل الروبوتات الإنشائية',role:'Construction Robotics',icon:'🤖' },
-  { id:'smarthomes', name:'وكيلة البيوت الذكية',     role:'Smart Homes',         icon:'🏠' },
-  { id:'reception',  name:'أبو راشد — الاستقبال',    role:'Reception',           icon:'📞' }
-];
-
-/* ═══════════════════ سكربتات المحاكاة (C2 fix: تقليل سكربت فهيم) ═══════════════════ */
-const SIM_SCRIPTS = {
-  fahim: [
-    { delay: 1200, role:'agent', text:'السلام عليكم. أنا فهيم، منسّق منظومة الوكلاء في القصواء للتطوير العقاري. تحت أمرك بأي استفسار.' }
-  ]
+/* ════ بيانات بطاقات الوكلاء ════ */
+const AGENTS_META = {
+  fahim:      { name:'فهيم',                     role:'المنسّق الرئيسي',       icon:'🧠', desc:'يستقبل أسئلتك ويحوّلك للمتخصص' },
+  network:    { name:'مسؤول الشبكات',            role:'Network Engineer',       icon:'🌐', desc:'شبكات، VPN، Wi-Fi، جدران نارية' },
+  systems:    { name:'مسؤول الأنظمة',            role:'Systems Administrator',  icon:'🖥️', desc:'سيرفرات، أنظمة تشغيل، نسخ احتياطي' },
+  apps:       { name:'مسؤولة التطبيقات',         role:'Application Manager',    icon:'💼', desc:'ERP، CRM، قواعد بيانات، تكاملات' },
+  bim:        { name:'مسؤول الـ BIM',             role:'BIM Manager',            icon:'🏗️', desc:'نمذجة المباني، Revit، BIM 360' },
+  trainer:    { name:'المدرّبة التقنية',          role:'Tech Trainer',           icon:'📚', desc:'تدريب الموظفين، المناهج التقنية' },
+  robotics:   { name:'وكيل الروبوتات الإنشائية', role:'Construction Robotics',  icon:'🚁', desc:'طائرات مسيّرة، ماسحات ليزرية' },
+  smarthomes: { name:'وكيلة البيوت الذكية',      role:'Smart Homes Engineer',   icon:'🏠', desc:'IoT، KNX، Matter، أتمتة الوحدات' },
+  reception:  { name:'أبو راشد',                 role:'موظف الاستقبال',         icon:'👋', desc:'الترحيب، التوجيه، الاستفسارات' },
 };
 
-/* ═══════════════════ حالة التطبيق ═══════════════════ */
-let activeAgentId   = 'fahim';
+const AGENT_ORDER = ['fahim','network','systems','apps','bim','trainer','robotics','smarthomes','reception'];
+
+/* ════ سكريبتات المحاكاة للوكلاء غير المربوطين ════ */
+const SIM_SCRIPTS = {
+  systems:    [{ delay:1200, text:'مرحباً! أنا مسؤول الأنظمة. لدينا بنية هجينة: سيرفرات فيزيائية مع بيئة سحابية Azure.' }],
+  apps:       [{ delay:1200, text:'أهلاً! أنا مسؤولة التطبيقات. نُشغّل حزمة ERP متكاملة مع CRM مخصّص.' }],
+  bim:        [{ delay:1200, text:'مرحباً! أنا مسؤول الـ BIM. نعمل على Revit مع BIM 360 لإدارة نماذج المشاريع.' }],
+  trainer:    [{ delay:1200, text:'أهلاً! أنا المدرّبة التقنية. نقدّم برامج تدريب مُصمَّمة لكل قسم وفق مستوى الموظف.' }],
+  robotics:   [{ delay:1200, text:'مساء الخير! أنا وكيل الروبوتات الإنشائية. نستخدم طائرات مسيّرة لمراقبة المواقع يومياً.' }],
+  smarthomes: [{ delay:1200, text:'أهلاً! أنا وكيلة البيوت الذكية. ننفّذ منظومة Matter/KNX متكاملة.' }],
+  reception:  [{ delay:1200, text:'أهلاً وسهلاً! أنا أبو راشد من الاستقبال. حياك الله، أي استفسار أقدر أوجّهك فيه؟' }],
+};
+
+/* ════ حالة التطبيق ════ */
+let activeAgentKey  = null;
+let conversation    = null;   // جلسة ElevenLabs الحالية
+let isMuted         = false;
+let isTransferring  = false;
 let sessionStarted  = false;
-let simulationMode  = true;
-let micMuted        = false;
 let lastUserMsg     = '';
 let simTimers       = [];
-let convAPI         = null;
+let ConvAPI         = null;   // ElevenLabs Conversation class
 
-/* ═══════════════════ C3 fix: تعريف __syncConvAPI ═══════════════════ */
-window.__syncConvAPI = function() {
-  if (window.ElevenLabsConvAI) {
-    convAPI = window.ElevenLabsConvAI;
-    console.log('[ConvAI] SDK جاهز.');
+/* ════ Helper: هل الوكيل حقيقي (له ID صالح)؟ ════ */
+function isRealAgent(key) {
+  const id = AGENT_IDS[key];
+  return !!(id && id.trim().length > 8 && !id.startsWith('AGENT_ID_') && !id.includes('placeholder'));
+}
+
+/* ════ نص شارة الوضع الهجين ════ */
+function getHybridBadgeText() {
+  const liveAgents = AGENT_ORDER.filter(isRealAgent);
+  const simCount   = AGENT_ORDER.length - liveAgents.length;
+  const liveLabel  = liveAgents.length === 2 ? 'وكيلان' : `${liveAgents.length} وكلاء`;
+  return `🔬 وضع تجريبي — ${liveLabel} متصلان · ${simCount} في محاكاة`;
+}
+
+/* ════ مزامنة SDK (يُستدعى من onSDKLoad) ════ */
+window.__syncConvAPI = function () {
+  if (window.__ConvAPI) {
+    ConvAPI = window.__ConvAPI;
+    console.log('[SDK] ✅ ConvAPI جاهز للاستخدام');
   }
 };
 
-/* ═══════════════════ بناء البطاقات ═══════════════════ */
+/* ════ بناء شبكة البطاقات ════ */
 function buildGrid() {
-  const grid = document.getElementById('agentGrid');
-  grid.innerHTML = '';
-  AGENTS_META.forEach(a => {
-    const card = document.createElement('button');
-    card.className = 'agent-card' + (a.id === 'fahim' ? ' fahim active' : '');
-    card.dataset.id = a.id;
-    card.setAttribute('aria-label', a.name);
-    card.innerHTML = `
-      <div class="agent-avatar">${a.icon}</div>
-      <div class="agent-name">${a.name}</div>
-      <div class="agent-role">${a.role}</div>
-      <div class="agent-status"><span class="dot"></span><span class="status-text">جاهز</span></div>
-    `;
-    card.addEventListener('click', () => onCardClick(a.id));
-    grid.appendChild(card);
-  });
+  const grid = document.getElementById('agentsGrid');
+  grid.innerHTML = AGENT_ORDER.map(key => {
+    const m = AGENTS_META[key];
+    const liveMark = isRealAgent(key)
+      ? '<span style="position:absolute;top:6px;right:7px;font-size:0.58rem;color:#4CAF50;font-weight:800;letter-spacing:0">●LIVE</span>'
+      : '';
+    return `
+      <div class="agent-card" id="card-${key}" onclick="onCardClick('${key}')">
+        <div class="card-badge" id="badge-${key}"></div>
+        ${liveMark}
+        <div class="card-icon">${m.icon}</div>
+        <div class="card-name">${m.name}</div>
+        <div class="card-role">${m.role}</div>
+        <div class="card-desc">${m.desc}</div>
+      </div>`;
+  }).join('');
+  console.log('[Grid] ✅ الشبكة جاهزة');
+  console.log('[Grid] LIVE:', AGENT_ORDER.filter(isRealAgent).join(', '));
+  console.log('[Grid] SIM: ', AGENT_ORDER.filter(k => !isRealAgent(k)).join(', '));
 }
 
-function setActiveCard(id) {
-  document.querySelectorAll('.agent-card').forEach(c => {
-    c.classList.toggle('active', c.dataset.id === id);
-    const dot = c.querySelector('.dot');
-    const txt = c.querySelector('.status-text');
-    if (c.dataset.id === id) {
-      dot.style.background = 'var(--ok)';
-      txt.textContent = 'نشط';
+function setActiveCard(key, withAnimation = false) {
+  const prevKey = activeAgentKey;
+  AGENT_ORDER.forEach(k => {
+    const card = document.getElementById(`card-${k}`);
+    card.classList.remove('active','available','leaving','entering');
+    if (!key) return;
+    if (k === key) {
+      if (withAnimation) {
+        card.classList.add('entering');
+        card.addEventListener('animationend', () => {
+          card.classList.remove('entering'); card.classList.add('active');
+        }, { once: true });
+      } else {
+        card.classList.add('active');
+      }
     } else {
-      dot.style.background = 'var(--muted)';
-      txt.textContent = 'جاهز';
+      if (withAnimation && k === prevKey) {
+        card.classList.add('leaving');
+        card.addEventListener('animationend', () => {
+          card.classList.remove('leaving'); card.classList.add('available');
+        }, { once: true });
+      } else {
+        card.classList.add('available');
+      }
     }
   });
-  activeAgentId = id;
+  activeAgentKey = key;
+  document.getElementById('activeAgentName').textContent = key ? AGENTS_META[key].name : '—';
 }
 
 function clearAllCards() {
-  document.querySelectorAll('.agent-card').forEach(c => {
-    c.classList.remove('active');
-    c.querySelector('.dot').style.background = 'var(--muted)';
-    c.querySelector('.status-text').textContent = 'جاهز';
-  });
+  AGENT_ORDER.forEach(k =>
+    document.getElementById(`card-${k}`)
+      .classList.remove('active','available','leaving','entering'));
+  activeAgentKey = null;
+  document.getElementById('activeAgentName').textContent = '—';
 }
 
-/* ═══════════════════ شريط الحالة والنص ═══════════════════ */
-function setStatus(text, color) {
-  const el = document.getElementById('statusText');
-  el.textContent = text;
-  el.style.color = color || 'var(--ink)';
+/* ════ شريط الحالة ════ */
+const STATUS_LABELS = { idle:'صامت', listening:'يستمع', speaking:'يتكلّم', transferring:'جاري التحويل' };
+function setStatus(s) {
+  document.getElementById('sDot').className = `s-dot ${s}`;
+  document.getElementById('sLabel').textContent = STATUS_LABELS[s] || s;
 }
 
-function addTranscript(role, text) {
-  const box = document.getElementById('transcript');
-  const div = document.createElement('div');
-  div.className = 'msg ' + role;
-  div.innerHTML = `<strong>${role === 'agent' ? 'الوكيل' : 'أنت'}:</strong> ${escHtml(text)}`;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
+/* ════ الـ Transcript ════ */
+function addTranscript(role, text, agentKey = null) {
+  const names = { user:'أنت', agent: agentKey ? AGENTS_META[agentKey]?.name : 'الوكيل', system:'النظام' };
+  const panel = document.getElementById('transcriptPanel');
+  const row = document.createElement('div');
+  row.className = 'tr-row';
+  row.innerHTML = `
+    <span class="tr-who ${role}">${names[role] || role}:</span>
+    <span class="tr-text ${role==='system'?'system':''}">${escHtml(text)}</span>`;
+  panel.appendChild(row);
+  panel.scrollTop = panel.scrollHeight;
+  if (role === 'user') lastUserMsg = text;
+  console.log(`[Transcript][${role.toUpperCase()}] ${text}`);
 }
 
-function escHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-/* ═══════════════════ منطق التحويل ═══════════════════ */
-function detectTransfer(text) {
-  const t = String(text).toLowerCase();
-  let best = null, bestScore = 0;
-  for (const [agent, words] of Object.entries(TRANSFER_KEYWORDS)) {
-    let score = 0;
-    for (const w of words) if (t.includes(w.toLowerCase())) score++;
-    if (score > bestScore) { bestScore = score; best = agent; }
-  }
-  return bestScore > 0 ? best : null;
-}
-
+/* ════ كشف نية التحويل من ردّ الوكيل ════ */
 function detectIntent(text) {
   const t = String(text).toLowerCase().trim();
-  if (!t) return null;
   for (const [intent, words] of Object.entries(USER_INTENT_KEYWORDS)) {
     for (const w of words) if (t.includes(w.toLowerCase())) return intent;
   }
   return null;
 }
 
-async function executeTransfer(targetId) {
-  const meta = AGENTS_META.find(a => a.id === targetId);
-  if (!meta) return;
-  const overlay = document.getElementById('transferOverlay');
-  overlay.querySelector('.transfer-text').textContent = `جاري التحويل إلى: ${meta.name}…`;
-  overlay.classList.add('show');
-  await sleep(900);
-  overlay.classList.remove('show');
-  setActiveCard(targetId);
-  setStatus(`متّصل مع: ${meta.name}`, 'var(--ok)');
-  addTranscript('agent', `تحويلك للوكيل ${meta.name}.`);
+function detectTopic(text) {
+  const t = text.toLowerCase();
+  let best = null, bestScore = 0;
+  for (const [agent, words] of Object.entries(TOPIC_KEYWORDS)) {
+    const score = words.filter(w => t.includes(w.toLowerCase())).length;
+    if (score > bestScore) { bestScore = score; best = agent; }
+  }
+  return bestScore > 0 ? best : null;
 }
 
-/* ═══════════════════ إدارة الجلسة ═══════════════════ */
-function startSession() {
-  sessionStarted = true;
-  document.getElementById('startScreen').style.display = 'none';
-  setStatus('الجلسة نشطة', 'var(--ok)');
-  if (simulationMode) {
-    document.getElementById('simBadge').classList.add('show');
-    document.getElementById('simInputBar').classList.add('show');
-    startSimulation('fahim');
+function detectTransfer(text) {
+  if (isTransferring) return null;
+  const t = String(text).trim();
+
+  console.log(`[Detect] فحص نص (${t.length} حرف): "${t.substring(0, 70)}…"`);
+
+  // الحالة الخاصة: "هذا خارج اختصاصي" — ابحث عن اسم وكيل في النص كله
+  if (/هذا خارج اختصاص(?:ي|نا)|خارج نطاق(?:ي|نا)|ليس تخصص(?:ي|نا)/.test(t)) {
+    console.log('[Detect] عبارة "خارج الاختصاص" — بحث عن اسم وكيل في النص');
+    for (const [kw, target] of Object.entries(TRANSFER_KEYWORDS)) {
+      if (target !== activeAgentKey && t.includes(kw)) {
+        console.log(`[Detect] ✅ خارج الاختصاص + "${kw}" → ${target}`);
+        return target;
+      }
+    }
+  }
+
+  // الأنماط المنظّمة
+  for (const rx of TRANSFER_PHRASES) {
+    const m = t.match(rx);
+    if (m && m[1]) {
+      const mention = m[1].trim();
+      console.log(`[Detect] نمط مطابق — mention: "${mention}"`);
+      for (const [kw, target] of Object.entries(TRANSFER_KEYWORDS)) {
+        const matchLen = Math.min(kw.length, mention.length, 7);
+        if (mention.includes(kw) || kw.substring(0, matchLen) === mention.substring(0, matchLen)) {
+          if (target !== activeAgentKey) {
+            console.log(`[Detect] ✅ تطابق اسم: "${kw}" → ${target}`);
+            return target;
+          }
+        }
+      }
+    }
+  }
+
+  // البحث الاحتياطي: مؤشر تحويل + اسم وكيل
+  const hasIndicator = TRANSFER_INDICATORS.some(ind => t.includes(ind));
+  if (hasIndicator) {
+    console.log('[Detect] مؤشر تحويل موجود — بحث احتياطي عن اسم الوكيل');
+    for (const [kw, target] of Object.entries(TRANSFER_KEYWORDS)) {
+      if (target !== activeAgentKey && t.includes(kw)) {
+        console.log(`[Detect] ✅ بحث احتياطي: "${kw}" → ${target}`);
+        return target;
+      }
+    }
+  }
+
+  return null;
+}
+
+/* ════ تنفيذ التحويل ════ */
+async function executeTransfer(targetKey) {
+  if (isTransferring || targetKey === activeAgentKey) return;
+  isTransferring = true;
+  const srcKey = activeAgentKey;
+  const meta   = AGENTS_META[targetKey];
+
+  console.log('[Transfer] ══════════════════════════════════════');
+  console.log(`[Transfer] ⚡ ${srcKey} (${isRealAgent(srcKey)?'LIVE':'SIM'}) → ${targetKey} (${isRealAgent(targetKey)?'LIVE':'SIM'})`);
+  console.log(`[Transfer] سياق: آخر سؤال = "${lastUserMsg}"`);
+
+  setStatus('transferring');
+  document.getElementById('transferTitle').textContent = `جاري التحويل إلى ${meta.name}`;
+  document.getElementById('transferSub').textContent   = meta.role;
+  document.getElementById('transferOverlay').classList.add('show');
+  addTranscript('system', `⚡ التحويل إلى ${meta.name}...`);
+
+  await sleep(700);
+  await endCurrentSession(true);
+  setActiveCard(targetKey, true);
+  await sleep(500);
+
+  document.getElementById('transferOverlay').classList.remove('show');
+  isTransferring = false;
+  console.log(`[Transfer] ✅ اكتمل التحويل → ${targetKey}`);
+
+  const ctxMsg = lastUserMsg
+    ? `وصلني سؤالك عن "${lastUserMsg}"، اسمح لي أجيبك.`
+    : `تم التحويل إليّ من ${AGENTS_META[srcKey]?.name || 'زميلي'}. كيف أقدر أساعدك؟`;
+
+  await startAgentSession(targetKey, ctxMsg);
+}
+
+/* ════ بدء جلسة — هجينة ════ */
+async function startAgentSession(agentKey, firstMsgOverride = null) {
+  console.log('[Session] ══════════════════════════════════════');
+  console.log(`[Session] الوكيل: ${agentKey} | نوع: ${isRealAgent(agentKey) ? '🟢 LIVE' : '🟡 SIM'}`);
+  if (firstMsgOverride) console.log(`[Session] firstMsg override: "${firstMsgOverride}"`);
+
+  if (isRealAgent(agentKey)) {
+    await startRealSession(agentKey, firstMsgOverride);
+  } else {
+    startSimulation(agentKey, firstMsgOverride);
   }
 }
 
-function endCurrentSession() {
-  clearSimTimers();
-  sessionStarted = false;
-  setActiveCard('fahim');
-  document.getElementById('simBadge').classList.remove('show');
-  document.getElementById('simInputBar').classList.remove('show');
-  document.getElementById('transcript').innerHTML = '';
-  setStatus('غير متصل', 'var(--muted)');
+async function startRealSession(agentKey, firstMsgOverride = null) {
+  if (!ConvAPI) {
+    console.error('[RealSession] ❌ ElevenLabs SDK غير محمّل — تراجع للمحاكاة');
+    showToast('⚠️ SDK غير محمّل — تشغيل محاكاة مؤقتة');
+    startSimulation(agentKey, firstMsgOverride);
+    return;
+  }
+
+  const agentId = AGENT_IDS[agentKey];
+  console.log(`[RealSession] 🔌 فتح WebSocket | agentId: ${agentId}`);
+
+  try {
+    const opts = {
+      agentId,
+      onConnect: () => {
+        console.log(`[RealSession] ✅ WebSocket متصل: ${agentKey}`);
+        setStatus('listening');
+        hideError();
+      },
+      onDisconnect: () => {
+        console.log(`[RealSession] 🔌 WebSocket انقطع: ${agentKey}`);
+        if (!isTransferring) { setStatus('idle'); showError(); }
+      },
+      onError: (msg, ctx) => {
+        console.error(`[RealSession] ❌ خطأ WebSocket [${agentKey}]:`, msg, ctx);
+        if (!isTransferring) showError();
+      },
+      onMessage: ({ message, source }) => {
+        console.log(`[RealSession] 📨 رسالة واردة | source=${source} | "${message}"`);
+        if (source === 'ai') {
+          addTranscript('agent', message, agentKey);
+          const target = detectTransfer(message);
+          if (target) {
+            console.log(`[RealSession] 🔄 نية تحويل → ${target} — تنفيذ بعد 1.8 ث`);
+            setTimeout(() => executeTransfer(target), 1800);
+          }
+        } else if (source === 'user') {
+          addTranscript('user', message);
+        }
+      },
+      onStatusChange: ({ status }) => {
+        console.log(`[RealSession] 🔄 حالة الاتصال: ${status}`);
+        if (status === 'connected') setStatus('listening');
+      },
+      onModeChange: ({ mode }) => {
+        console.log(`[RealSession] 🎙️ وضع الصوت: ${mode}`);
+        setStatus(mode === 'speaking' ? 'speaking' : 'listening');
+      },
+    };
+
+    if (firstMsgOverride) {
+      opts.overrides = { agent: { firstMessage: firstMsgOverride } };
+      console.log(`[RealSession] 💬 firstMessage override مُحقَن`);
+    }
+
+    conversation = await ConvAPI.startSession(opts);
+    console.log(`[RealSession] 🎤 جلسة نشطة: ${agentKey}`);
+
+    if (isMuted && conversation?.setVolume) conversation.setVolume({ volume: 0 });
+
+  } catch (err) {
+    console.error(`[RealSession] ❌ فشل startSession [${agentKey}]:`, err);
+    showError();
+  }
 }
 
-function startSimulation(agentId) {
+async function endCurrentSession(silent = false) {
   clearSimTimers();
-  const script = SIM_SCRIPTS[agentId];
-  if (!script) return;
-  script.forEach(line => {
-    const t = setTimeout(() => addTranscript(line.role, line.text), line.delay);
+  if (conversation) {
+    try {
+      await conversation.endSession();
+      console.log(`[Session] 🔴 إنهاء جلسة ElevenLabs: ${activeAgentKey}`);
+    } catch (e) { console.warn('[Session] تحذير عند الإنهاء:', e); }
+    conversation = null;
+  } else {
+    console.log(`[Session] 🔴 إنهاء جلسة محاكاة: ${activeAgentKey}`);
+  }
+  if (!silent) setStatus('idle');
+}
+
+function startSimulation(agentKey, firstMsgOverride = null) {
+  console.log(`[Sim] 🎭 بدء محاكاة: ${agentKey}`);
+  clearSimTimers();
+  setStatus('listening');
+
+  const base = SIM_SCRIPTS[agentKey] || [];
+  const msgs = firstMsgOverride
+    ? [{ delay:1100, text:firstMsgOverride }, ...base.slice(1)]
+    : base;
+
+  if (msgs.length === 0) {
+    console.warn(`[Sim] لا يوجد سكريبت للوكيل: ${agentKey}`);
+    return;
+  }
+  msgs.forEach(msg => {
+    const t = setTimeout(() => {
+      setStatus('speaking');
+      addTranscript('agent', msg.text, agentKey);
+      const target = detectTransfer(msg.text);
+      if (target) setTimeout(() => executeTransfer(target), 2200);
+      else         setTimeout(() => setStatus('listening'), 1800);
+    }, msg.delay);
     simTimers.push(t);
   });
 }
 
-function clearSimTimers() {
-  simTimers.forEach(t => clearTimeout(t));
-  simTimers = [];
-}
+function clearSimTimers() { simTimers.forEach(clearTimeout); simTimers = []; }
 
-/* ═══════════════════ إدخال المحاكاة ═══════════════════ */
-function simInputKeydown(e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    sendSimInput();
-  }
-}
+/* ════ إدخال المحاكاة ════ */
+function simInputKeydown(e) { if (e.key === 'Enter') { e.preventDefault(); sendSimInput(); } }
 
-/* ═══════════════════ C1 fix: ردود حسب النية والمحتوى ═══════════════════ */
 function sendSimInput() {
   const input = document.getElementById('simInput');
-  const text = input.value.trim();
-  if (!text) return;
-  lastUserMsg = text;
+  const text  = input.value.trim();
+  if (!text || !sessionStarted) return;
   addTranscript('user', text);
   input.value = '';
 
-  const target = detectTransfer(text);
-  const intent = detectIntent(text);
-
-  if (activeAgentId === 'fahim') {
-    if (target) {
-      setTimeout(() => executeTransfer(target), 700);
-      setTimeout(() => {
-        const resp = AGENT_RESPONSES[target];
-        if (!resp) return;
-        const reply = resp[intent] || resp.default;
-        addTranscript('agent', reply);
-      }, 1900);
+  // فهيم في وضع المحاكاة: يوجّه للمتخصص أو يرد بنفسه
+  if (activeAgentKey === 'fahim' && !isRealAgent('fahim')) {
+    const topic  = detectTopic(text);
+    const intent = detectIntent(text);
+    if (topic) {
+      setTimeout(() => { executeTransfer(topic); }, 700);
     } else if (intent) {
       const replies = {
-        greeting:    'وعليكم السلام. أنا فهيم منسّق وكلاء القصواء. كيف أقدر أوجّهك؟',
-        whoAreYou:   'أنا فهيم، المنسّق العام لمنظومة وكلاء القصواء للتطوير العقاري.',
-        whatDoYouDo: 'أستقبل استفساراتك وأحوّلك للوكيل المختص: شبكات، أنظمة، تطبيقات، BIM، تدريب، روبوتات، بيوت ذكية، أو الاستقبال.',
+        greeting:    'وعليكم السلام. أنا فهيم، منسّق وكلاء القصواء. كيف أقدر أوجّهك؟',
+        whoAreYou:   'أنا فهيم، المنسّق العام لمنظومة الوكلاء الذكية في القصواء للتطوير العقاري.',
+        whatDoYouDo: 'أستقبل استفساراتك وأحوّلك للمتخصص: شبكات، أنظمة، تطبيقات، BIM، تدريب، روبوتات، بيوت ذكية، أو الاستقبال.',
         thanks:      'العفو، تحت أمرك.',
-        bye:         'مع السلامة.'
+        bye:         'مع السلامة.',
       };
-      setTimeout(() => addTranscript('agent', replies[intent] || 'تفضّل بسؤالك.'), 700);
+      setTimeout(() => addTranscript('agent', replies[intent] || 'تفضّل بسؤالك.', 'fahim'), 700);
     } else {
-      setTimeout(() => addTranscript('agent', 'لم أتعرّف على تخصص واضح في سؤالك. تحب أحوّلك لـ: الشبكات، الأنظمة، التطبيقات، BIM، التدريب، الروبوتات، البيوت الذكية، أو الاستقبال؟'), 700);
+      setTimeout(() => addTranscript('agent',
+        'لم أتعرّف على تخصص واضح. تحب أحوّلك لـ: الشبكات، الأنظمة، التطبيقات، BIM، التدريب، الروبوتات، البيوت الذكية، أو الاستقبال؟', 'fahim'), 700);
     }
-  } else {
-    const resp = AGENT_RESPONSES[activeAgentId];
-    if (!resp) return;
-    setTimeout(() => addTranscript('agent', resp[intent] || resp.default), 700);
+  } else if (!isRealAgent(activeAgentKey)) {
+    // وكيل متخصص في وضع المحاكاة
+    const resp   = AGENT_RESPONSES[activeAgentKey];
+    const intent = detectIntent(text);
+    if (resp) {
+      setTimeout(() => {
+        setStatus('speaking');
+        addTranscript('agent', resp[intent] || resp.default, activeAgentKey);
+        setTimeout(() => setStatus('listening'), 1800);
+      }, 800);
+    }
   }
+  // إن كان الوكيل LIVE، الـ onMessage يتولى الأمر تلقائياً
 }
 
-/* ═══════════════════ بدء العرض ═══════════════════ */
-function startPresentation() {
-  startSession();
-}
+/* ════ أزرار التحكم ════ */
+async function startPresentation() {
+  console.log('[App] ═══ بدء العرض التقديمي ═══');
+  const screen = document.getElementById('startScreen');
+  screen.classList.add('fade-out');
+  setTimeout(() => screen.classList.add('hidden'), 500);
 
-/* ═══════════════════ العودة لفهيم ═══════════════════ */
-function returnToFahim() {
-  lastUserMsg = '';
-  clearSimTimers();
-  setActiveCard('fahim');
-  setStatus('متّصل مع: فهيم — المنسّق', 'var(--ok)');
-  addTranscript('agent', 'رجعنا لفهيم. كيف أقدر أساعدك؟');
-}
+  sessionStarted = true;
+  document.getElementById('returnBtn').disabled = false;
+  document.getElementById('endBtn').disabled    = false;
 
-/* ═══════════════════ C4 fix: إنهاء وإعادة الإقلاع ═══════════════════ */
-function endConversation() {
-  if (!confirm('هل تريد إنهاء الحوار؟')) return;
-  endCurrentSession();
-  document.getElementById('startScreen').style.display = 'flex';
-}
-
-/* ═══════════════════ كتم/تشغيل المايك ═══════════════════ */
-function toggleMic() {
-  micMuted = !micMuted;
-  const btn = document.getElementById('micBtn');
-  btn.textContent = micMuted ? '🔇 المايك مكتوم' : '🎤 تشغيل المايك';
-  showToast(micMuted ? 'تم كتم المايك' : 'تم تشغيل المايك');
-}
-
-/* ═══════════════════ ضغط بطاقة ═══════════════════ */
-function onCardClick(id) {
-  if (!sessionStarted) {
-    showToast('ابدأ الجلسة أولًا');
-    return;
-  }
-  if (id === activeAgentId) return;
-  executeTransfer(id);
-}
-
-/* ═══════════════════ تبديل وضع المحاكاة ═══════════════════ */
-function toggleSimMode() {
-  simulationMode = !simulationMode;
   const badge = document.getElementById('simBadge');
-  const bar   = document.getElementById('simInputBar');
-  if (simulationMode && sessionStarted) {
-    badge.classList.add('show');
-    bar.classList.add('show');
-    hideError();
+  badge.textContent = getHybridBadgeText();
+  badge.classList.add('show');
+  document.getElementById('simInputBar').classList.add('show');
+
+  console.log('[App] وضع تشغيل الوكلاء:');
+  AGENT_ORDER.forEach(k => console.log(`  ${k}: ${isRealAgent(k) ? '🟢 LIVE' : '🟡 SIM'}`));
+
+  setActiveCard('fahim');
+  await startAgentSession('fahim');
+}
+
+async function returnToFahim() {
+  if (!sessionStarted || activeAgentKey === 'fahim' || isTransferring) return;
+  console.log('[App] العودة لفهيم');
+  addTranscript('system', 'العودة إلى فهيم...');
+  await executeTransfer('fahim');
+}
+
+async function endConversation() {
+  if (!sessionStarted) return;
+  console.log('[App] ═══ إنهاء الحوار ═══');
+  await endCurrentSession();
+  clearAllCards();
+  setStatus('idle');
+  document.getElementById('returnBtn').disabled = true;
+  document.getElementById('endBtn').disabled    = true;
+  document.getElementById('simBadge').classList.remove('show');
+  document.getElementById('simInputBar').classList.remove('show');
+  document.getElementById('transcriptPanel').innerHTML = '';
+  sessionStarted = false;
+  lastUserMsg    = '';
+  showToast('تم إنهاء الحوار');
+}
+
+function toggleMic() {
+  isMuted = !isMuted;
+  const btn = document.getElementById('micBtn');
+  if (isMuted) {
+    btn.textContent = '🔇'; btn.classList.add('muted'); btn.classList.remove('live');
+    if (conversation?.setVolume) conversation.setVolume({ volume: 0 });
+    showToast('🔇 صوت الوكيل مكتوم');
+    console.log('[Mic] مكتوم');
   } else {
-    badge.classList.remove('show');
-    bar.classList.remove('show');
+    btn.textContent = '🎤'; btn.classList.remove('muted'); btn.classList.add('live');
+    if (conversation?.setVolume) conversation.setVolume({ volume: 1 });
+    showToast('🎤 صوت الوكيل مفعّل');
+    console.log('[Mic] مفعّل');
   }
-  showToast(simulationMode ? 'وضع المحاكاة مفعّل' : 'وضع المحاكاة معطّل');
 }
 
-/* ═══════════════════ C5 fix: لا يظهر بانر الانقطاع في وضع المحاكاة ═══════════════════ */
-function showError(msg) {
-  if (!sessionStarted || simulationMode) return;
-  const banner = document.getElementById('errorBanner');
-  banner.querySelector('.error-text').textContent = msg || 'انقطع الاتصال.';
-  banner.classList.add('show');
+function onCardClick(key) {
+  if (!sessionStarted || isTransferring || key === activeAgentKey) return;
+  if (window.confirm(`تحويل مباشر إلى "${AGENTS_META[key].name}"؟`)) {
+    console.log(`[Card] تحويل يدوي → ${key}`);
+    executeTransfer(key);
+  }
 }
 
+function toggleSimMode() {
+  const lbl = document.getElementById('simLabel');
+  lbl.textContent = lbl.textContent === 'إيقاف' ? 'تشغيل' : 'إيقاف';
+}
+
+/* ════ الأخطاء ════ */
+function showError() {
+  if (!sessionStarted) return;
+  document.getElementById('errorBanner').classList.add('show');
+}
 function hideError() {
   document.getElementById('errorBanner').classList.remove('show');
 }
@@ -628,18 +895,9 @@ function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 document.addEventListener('DOMContentLoaded', () => {
   buildGrid();
   setActiveCard('fahim');
-  setStatus('غير متصل', 'var(--muted)');
-
-  document.getElementById('startBtn').addEventListener('click', startPresentation);
-  document.getElementById('returnBtn').addEventListener('click', returnToFahim);
-  document.getElementById('endBtn').addEventListener('click', endConversation);
-  document.getElementById('micBtn').addEventListener('click', toggleMic);
-  document.getElementById('simToggle').addEventListener('change', toggleSimMode);
-  document.getElementById('retryBtn').addEventListener('click', retryConnection);
-  document.getElementById('sendBtn').addEventListener('click', sendSimInput);
-  document.getElementById('simInput').addEventListener('keydown', simInputKeydown);
-
-  console.log('[App] جاهز. وضع المحاكاة:', simulationMode);
+  setStatus('idle');
+  console.log('[App] ✅ جاهز. حالة الوكلاء:');
+  AGENT_ORDER.forEach(k => console.log(`  ${k}: ${isRealAgent(k) ? '🟢 LIVE' : '🟡 SIM'}`));
 });
 </script>
 </body>
