@@ -306,14 +306,14 @@
    بيانات الوكلاء — كل شيء في مكان واحد
    ══════════════════════════════════════════════════════════ */
 const AGENTS = {
-  fahim:      { name: 'فهيم',                     role: 'المنسّق الرئيسي',      icon: '🧠', desc: 'يستقبل أسئلتك ويحوّلك للمتخصص',  id: 'agent_0401krb9yspvff1rymvs0jetr7xr' },
-  network:    { name: 'مسؤول الشبكات',            role: 'Network Engineer',      icon: '🌐', desc: 'شبكات، VPN، Wi-Fi، جدران نارية',  id: 'agent_6701kqymma5zfw1ac38ey6jm32xs' },
-  systems:    { name: 'مسؤول الأنظمة',            role: 'Systems Administrator', icon: '🖥️', desc: 'سيرفرات، AD، نسخ احتياطي',        id: 'agent_9901krhkwj43frms4dqps4p1ypmz' },
-  apps:       { name: 'مسؤولة التطبيقات',         role: 'Application Manager',   icon: '💼', desc: 'ERP، CRM، قواعد بيانات',           id: 'agent_7901krhkyahhe9wrjsc303dd0a0k' },
-  bim:        { name: 'مسؤول الـ BIM',             role: 'BIM Manager',           icon: '🏗️', desc: 'Revit، BIM 360، Clash Detection',  id: 'agent_3101krhm17pafzyrmtnf92tdhkdj' },
-  trainer:    { name: 'المدرّبة التقنية',          role: 'Tech Trainer',          icon: '📚', desc: 'تدريب الموظفين، المناهج التقنية',  id: 'agent_5901krhm2a7jfmzsh522sxvtt7as' },
-  robotics:   { name: 'وكيل الروبوتات',           role: 'Construction Robotics', icon: '🚁', desc: 'طائرات مسيّرة، ماسحات ليزرية',    id: 'agent_7501krhm4g7kfsavd3azxpj1h627' },
-  smarthomes: { name: 'وكيلة البيوت الذكية',      role: 'Smart Homes Engineer',  icon: '🏠', desc: 'IoT، KNX، Matter، أتمتة الوحدات', id: 'agent_1501krhm6751ee9ayvpt5zdwc7bs' },
+  fahim:      { name: 'فهيم',                     role: 'المنسّق الرئيسي',      icon: '🧠', desc: 'منسّق استشاري — يحوّلك للمستشار المناسب', id: 'agent_0401krb9yspvff1rymvs0jetr7xr' },
+  network:    { name: 'مسؤول الشبكات',            role: 'Network Engineer',      icon: '🌐', desc: 'مستشار البنية التحتية للاتصالات',           id: 'agent_6701kqymma5zfw1ac38ey6jm32xs' },
+  systems:    { name: 'مسؤول الأنظمة',            role: 'Systems Administrator', icon: '🖥️', desc: 'مستشار الخوادم والنسخ الاحتياطي',           id: 'agent_9901krhkwj43frms4dqps4p1ypmz' },
+  apps:       { name: 'مسؤول التطبيقات',          role: 'Application Manager',   icon: '💼', desc: 'مستشار التطبيقات المؤسسية',                 id: 'agent_7901krhkyahhe9wrjsc303dd0a0k' },
+  bim:        { name: 'مسؤول الـ BIM',             role: 'BIM Manager',           icon: '🏗️', desc: 'مستشار نمذجة معلومات البناء',               id: 'agent_3101krhm17pafzyrmtnf92tdhkdj' },
+  trainer:    { name: 'المدرّب التقني',            role: 'Tech Trainer',          icon: '📚', desc: 'مستشار التدريب والتطوير المهني',             id: 'agent_5901krhm2a7jfmzsh522sxvtt7as' },
+  robotics:   { name: 'وكيل الروبوتات',           role: 'Construction Robotics', icon: '🚁', desc: 'مستشار التقنيات الميدانية الذكية',           id: 'agent_7501krhm4g7kfsavd3azxpj1h627' },
+  smarthomes: { name: 'وكيل البيوت الذكية',       role: 'Smart Homes Engineer',  icon: '🏠', desc: 'مستشار أنظمة الأتمتة',                      id: 'agent_1501krhm6751ee9ayvpt5zdwc7bs' },
 };
 
 const ORDER = ['fahim', 'network', 'systems', 'apps', 'bim', 'trainer', 'robotics', 'smarthomes'];
@@ -328,8 +328,15 @@ const TRANSFER_MAP = {
   'مسؤولة الأنظمة':         'systems',
   'مسؤولة التطبيقات':       'apps',
   'مسؤول التطبيقات':        'apps',
-  'مسؤول الـ BIM':           'bim',
-  'مسؤول BIM':               'bim',
+  'مسؤول الـ BIM':            'bim',
+  'مسؤول BIM':                'bim',
+  'مسؤول الـ بِي آي إم':     'bim',
+  'مسؤول بِي آي إم':          'bim',
+  'مسؤول الـ بي آي إم':      'bim',
+  'مسؤول بي آي إم':           'bim',
+  'مسؤول البيم':              'bim',
+  'مدير الـ BIM':             'bim',
+  'المدرّب التقني':          'trainer',
   'المدرّبة التقنية':        'trainer',
   'المدربة التقنية':         'trainer',
   'وكيل الروبوتات':          'robotics',
@@ -338,24 +345,46 @@ const TRANSFER_MAP = {
   'وكيل البيوت الذكية':      'smarthomes',
 };
 
-/* عبارات التحويل كما يُطلب من الوكلاء في System Prompts */
+/* عبارات التحويل — موسّعة لتغطية كل صياغات الوكلاء */
 const TRIGGERS = [
   'اسمح لي أحوّلك لـ',
   'اسمح لي احوّلك لـ',
   'اسمح لي أحولك لـ',
   'اسمح لي احولك لـ',
+  'اسمح لي أحوّلك ل',
+  'اسمح لي احوّلك ل',
+  'اسمح لي أحوّلك إلى',
+  'اسمح لي احوّلك إلى',
+  'اسمح لي بتحويلك إلى',
+  'اسمح لي بتحويلك لـ',
+  'اسمح لي بتحويلك ل',
+  'سأحوّلك لـ',
+  'سأحوّلك ل',
+  'سأحوّلك إلى',
+  'سأحولك لـ',
+  'سأحولك إلى',
+  'سأنقلك إلى',
+  'سأنقلك لـ',
+  'دعني أحوّلك لـ',
+  'دعني أحوّلك إلى',
+  'دعني أحولك لـ',
+  'أحوّلك الآن لـ',
+  'أحوّلك الآن إلى',
+  'سأقوم بتحويلك إلى',
+  'سأقوم بتحويلك لـ',
 ];
 
 /* ══════════════════════════════════════════════════════════
    حالة التطبيق — كائن واحد
    ══════════════════════════════════════════════════════════ */
 const state = {
-  activeKey:    null,
-  conv:         null,
-  muted:        false,
-  transferring: false,
-  started:      false,
-  lastUserMsg:  '',
+  activeKey:       null,
+  conv:            null,
+  muted:           false,
+  transferring:    false,
+  started:         false,
+  lastUserMsg:     '',
+  pendingTransfer: null,  // ينتظر انتهاء كلام الوكيل قبل التنفيذ
 };
 
 /* ══════════════════════════════════════════════════════════
@@ -492,6 +521,7 @@ function detectTransfer(text) {
    إدارة الجلسة
    ══════════════════════════════════════════════════════════ */
 async function endCurrentSession(silent = false) {
+  state.pendingTransfer = null;
   clearTimeout(_errorTimer);
   hideError();
   if (state.conv) {
@@ -551,10 +581,11 @@ async function startSession(key, firstMsgOverride = null) {
       onMessage: ({ message, source }) => {
         if (source === 'ai') {
           addTranscript('agent', message);
+          console.log(`[Msg:${key}] "${message}"`);
           const target = detectTransfer(message);
           if (target) {
-            console.log(`[Session] 🔄 تحويل إلى ${target} بعد 1.8 ث`);
-            setTimeout(() => executeTransfer(target), 1800);
+            console.log(`[Session] ⏳ تحويل معلّق إلى ${target} — ينتظر انتهاء الكلام`);
+            state.pendingTransfer = target;
           }
         } else if (source === 'user') {
           addTranscript('user', message);
@@ -564,6 +595,12 @@ async function startSession(key, firstMsgOverride = null) {
       onModeChange: ({ mode }) => {
         if (!state.transferring) {
           setStatus(mode === 'speaking' ? 'speaking' : 'listening');
+          if (mode !== 'speaking' && state.pendingTransfer) {
+            const target = state.pendingTransfer;
+            state.pendingTransfer = null;
+            console.log(`[Session] 🔄 تنفيذ التحويل إلى ${target} (انتهى الكلام)`);
+            setTimeout(() => executeTransfer(target), 400);
+          }
         }
       },
     };
@@ -623,11 +660,7 @@ async function executeTransfer(targetKey) {
   document.getElementById('transferOverlay').classList.remove('show');
   state.transferring = false;
 
-  const ctxMsg = state.lastUserMsg
-    ? `وصلني سؤالك عن "${state.lastUserMsg}"، تفضّل.`
-    : `تمّ التحويل إليّ من ${AGENTS[srcKey]?.name ?? 'زميلي'}. كيف أقدر أساعدك؟`;
-
-  await startSession(targetKey, ctxMsg);
+  await startSession(targetKey);  // بدون override — يبدأ بـ First Message الافتراضي
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -740,6 +773,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && state.started && !state.transferring) endConversation();
+
+    // R = العودة لفهيم
+    if (e.key === 'r' && state.started && !state.transferring && state.activeKey !== 'fahim') {
+      returnToFahim();
+    }
+
+    // الأرقام 1-8 = القفز السريع للوكلاء
+    const numKey = parseInt(e.key);
+    if (numKey >= 1 && numKey <= 8 && state.started && !state.transferring) {
+      const targetKey = ORDER[numKey - 1];
+      if (targetKey && targetKey !== state.activeKey && hasId(targetKey)) {
+        executeTransfer(targetKey);
+      }
+    }
   });
 
   console.log('[App] ✅ منظومة الوكلاء جاهزة |', ORDER.filter(hasId).length, 'وكيل متصل');
